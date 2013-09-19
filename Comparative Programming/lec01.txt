@@ -1,2 +1,31 @@
-Lecture 1
-=========
+Comparative Programming - Lecture 1
+===================================
+
+Programming paradigms:
+	Imperative: based on CPU architectures, E.g. C, Fortran
+	Functional: Focuses on WHAT to do rather than HOW
+	Object Orientation: E.g. Java, C++
+	Logic Programming: E.g. Prolog
+
+Multiparadigm Languages:
+	Java: Imperative, Object-Oriented
+
+3 Components of Languages:
+	Syntax
+	Semantics
+	Implementation: Compiler/Interpreter, Editors, Debuggers etc
+
+Interpreters vs Compilers
+	Interpretation makes debugging easier
+	Interpretation is slower
+	Compilation can make debugging harder - source code is thrown away
+	Compiled code typically much faster
+
+Semantics
+	Static semantics: typing systems etc
+	Dynamic semantics: meaning of the program
+
+3 Different styles for semantics
+	Denotational
+	Axiomatic
+	Operational
