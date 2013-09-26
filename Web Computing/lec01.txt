@@ -1,2 +1,8 @@
-Lecture 1
-=========
+INTRODUCTION
+
+Skip section on history when revising!
+Section on SGML was also skipped
+
+XML
+
+
