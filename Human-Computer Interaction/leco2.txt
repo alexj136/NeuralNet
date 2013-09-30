@@ -1,0 +1,56 @@
+Lecture 2
+=========
+
+Design Principles:
+
+Visibility: When I see a thing, is it clear, from looking at it, how I should
+interact with it
+
+Feedback: Does the thing assure you that an action has had the desired effect
+
+Constraints: Things that limit what the user can do. Making these constraints
+apparent is important
+
+Mapping: How do controls relate to actions? Is it obvious which control relates
+to which action?
+
+Consistency: ensuring similar tasks and actions have similar modes of
+interaction
+    External Consistency: are the actions in my application consistent with that
+    of others?
+
+Affordances: What does the design of the object allow/encourage? Chairs afford
+sitting, doorknobs afford twisting, buttons afford clicking.
+
+-----
+
+Conceptual Models:
+What does the user have to understand about your system to effectively use it?
+To email someone a document, they have to understand what a document is, what
+email is etc.
+
+Interface metaphors: Something in a computer interface is a metaphor for
+something in the real world, e.g. folders, shopping basket.
+    These can be negative - some calculator apps take the idea too far and
+    preserve more about the real world interface than they should. It can stop
+    designers from being objective in the way they design.
+
+-----
+
+Common interaction types:
+
+Instructing: giving instructions to an application, telling it what to do etc. 
+
+Conversing: the idea of having a conversation with a computing device to
+accomplish your task, e.g. siri. Some implementations work well for a limited
+range of applications.
+
+Direct manipulation: having the sense of being physically in control of the
+system you are interacting with, e.g. dragging a file to the recycle bin.
+
+Exploring: the sense of going in to a real world and exploring an environment.
+Widely used in video games. Maybe you can get lost, and that may be a good or
+bad thing.
+
+Objectively there is no 'best' interaction type, but one may be more appropriate
+for a specific task than another.
