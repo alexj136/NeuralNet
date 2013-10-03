@@ -1,0 +1,17 @@
+Lecture 3
+=========
+
+Currification: passing arguments one at a time.
+
+(+) is a currified version of +.
+
++ :: (Integer, Integer) -> Integer
+(+) :: Integer -> Integer -> Integer
+
+type variables have a quantity: the universal quantifier
+Types can be Monomorphic: every expression has at most one type, or:
+             Polymorphic: some expressions have at more than one type
+
+Polymorphism: The SAME code for every type
+Overloading: The same operator names, executing different code depending on the
+             types of the argument
