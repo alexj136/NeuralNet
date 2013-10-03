@@ -8,8 +8,8 @@ are very difficult to pin down and I worry that if I am required to identify
 such things in an exam I will not do well.
 	I thought it was interesting to see the lecture slides with pictures of old
 computer systems, like the punch-card computer at NASA and the old Apple Mac
-computer. I emailed Kate to hear her thoughts on punch card systems. I
-would also like to know if she has any ideas about programming languages in
+computer. I am interested to hear the lecturer's thoughts on punch card systems.
+I would also like to know if she has any ideas about programming languages in
 relation to HCI. Perhaps I will send an email.
 
 Week 2
@@ -18,4 +18,19 @@ Sending an email to Kate Howland has been helped with my concerns about the
 module. I now seems that the subject is more objective than I realised.
     It is interesting to see just how relative our judgements about effective
 design. As Kate said in her email, we have no way of judging designs in a
-vacuum.
+vacuum. When the punch card system was developed, or technological ability
+limited the degree to which the design could be user-centered.
+    The Tivo remote discussed in the text-book is an interesting example. There
+is certainly a problem with most TV remotes. I think the minimal approach that
+the Tivo remote takes could be taken even further - I think a 4-way navigation
+button, a select button, a power button and volume buttons would be ideal. This
+bare minimum allows all other functionality to be managed as part of the
+on-screen GUI. This would eliminate the problem that reading-glasses wearers
+have - they require glasses to see the remote buttons but not the TV screen.
+    The Tivo remote reminds me of an example of an iterface with awful feedback
+- my freesat box at home takes far too long to respond to button presses on the
+remote, sometimes as much as 10 seconds. It makes you think that the press was
+not detected, so you press it again, and then all of a sudden, it registers both
+presses. If you're scrolling through the TV guide and you were trying to go down
+a page, this means you accidentally go down two pages, which is very
+frustrating.
