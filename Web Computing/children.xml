@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <top>
+ This is the TOP level
+ <a1>
+   This is A1 level
+    <a2>
+   This is A2 level
+     <a3>
+      This is A3 level
+     </a3>
+    </a2>
+    <a2>Another A2 element</a2>
+ </a1>
+
+ <b1>
+   This is B1 level
+    <b2>This is B2 level</b2>
+ </b1>
+
+ <c1>
+   This is C1 level
+     <c2>This is C2 level <c3>This is C3 level <c4>This is C4 level <c5>This is C5 level</c5></c4></c3> </c2>
+ </c1> 
+</top>

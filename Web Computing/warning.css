@@ -1,0 +1,14 @@
+paragraph {
+    display: block;
+    width: 30%;
+    font-size: 24pt;
+	margin: 5%;
+}
+
+warning:before {
+    content: "*";
+    color: red;
+	left: 1em;
+	display: block;
+	position: absolute;
+}

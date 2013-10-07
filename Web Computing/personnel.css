@@ -1,0 +1,26 @@
+* {
+    font-size: 24pt;
+	background-color: #000080;
+	color: #ffffff;
+}
+
+person {
+	float: left;
+	display: inline;
+	margin: 2%;
+	width: 40%;
+	border: 2px solid black;
+	padding: 2%;
+}
+
+person > * {
+    display: block;
+}
+
+person[private="yes"] > salary {
+    display: none;
+}
+
+person > salary:before {
+    content: "$";
+}

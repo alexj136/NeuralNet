@@ -34,3 +34,10 @@ not detected, so you press it again, and then all of a sudden, it registers both
 presses. If you're scrolling through the TV guide and you were trying to go down
 a page, this means you accidentally go down two pages, which is very
 frustrating.
+
+Week 3
+
+The lecture began introducing the user centered design process, and we discussed
+the topic of understanding users in the iterative design process. The topics of
+human cognition and action, and user research methods relate to this part of the
+design process.
