@@ -1,0 +1,11 @@
+/* Default selector makes everything white */
+* {
+    background-color: white;
+	color: white;
+	display: block;
+	font-size: 24pt;
+}
+
+*:hover > * {
+    color: black;
+}
