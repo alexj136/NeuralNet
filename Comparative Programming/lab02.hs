@@ -10,10 +10,9 @@ insert x xs | x <= head xs = x:xs
             | otherwise    = [head xs] ++ insert x (tail xs)
 
 sort :: Ord a => [a] -> [a]
-sort []  = []
-sort [x] = [x]
-sort xs  | inorder xs = xs
-         | otherwise  = insert (head xs) ((sort . tail) xs)
+sort []    = []
+sort (h:t) | inorder (h:t) = (h:t)
+           | otherwise     = insert h (sort t)
 
 -- Question 2
 data BinaryTree a = EmptyNode
