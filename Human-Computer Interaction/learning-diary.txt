@@ -37,7 +37,39 @@ frustrating.
 
 Week 3
 
-The lecture began introducing the user centered design process, and we discussed
-the topic of understanding users in the iterative design process. The topics of
-human cognition and action, and user research methods relate to this part of the
-design process.
+For my group project this week, my 'homework' was to review an existing study
+assistant app, with a focus on usability & the design principles.
+    My chosen app is 'Papyrus', a handwriting/note-taking app for android.
+
+Usability Goals
+    Effectiveness - 4 stars. The pinch-to-pan/zoom feature allows you
+to edit writing either in fine detail, or in a less considered way.
+    Efficiency - 1 star. While the zooming/panning is ver effective, it does take a
+long time to actually input writing, because there is so much panning and
+zooming required to manipulate the page in order to be ready to enter text.
+Often when trying to pan & zoom, only one finger is registered, and instead of
+panning or zooming, a line is drawn. You then have to press 'undo', and try
+again. This is frustrating and slows things down considerably.
+    Learnability - 4 stars. Menus are very short, settings are well explained and
+not too extensive. The brush size/colour options are familiar and recalling how
+to use them is trivial.
+    Memorablity - 4 stars. The points from learnability apply here. There is so
+little to learn about the app that memorising the steps to achieve tasks is
+trivial.
+    Safety - 4 stars. There is a delete note/notebook confirmation which
+prevents accidental deletion. There are undo and redo buttons in the editor to
+undo mistakes. One potential (but rather unlikely) issue would be to make a
+mistake, and then leave the note. When you re-enter the note, you cannot undo
+previous changes. If this option were added, this would not be an issue.
+    Utility - 3 stars. A good range of options relating to handwriting entry,
+such as brush size, colour etc. Ability to sort notes into different categories,
+however one note cannot be in multiple categories. The app lacks anything beyond
+handwriting entry - on-screen keyboard entry would be very useful due to the
+slowness that results from the need to pan & zoom.
+
+Summary
+    Due to the inefficiency of the app's primary task, the app is effectively
+useless. The idea of the app is that handwriting entry is faster than using an
+on-screen keyboard, and therefore is a good replacement for it when speed is an
+issue, is completely undermined by the slowness that results from panning and
+zooming so often.
