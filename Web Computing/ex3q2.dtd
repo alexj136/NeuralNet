@@ -1,0 +1,10 @@
+<!ELEMENT anthology (poem*)>
+<!ELEMENT poem (title, stanza*)>
+    <!ATTLIST poem
+        id CDATA #REQUIRED
+        author CDATA #REQUIRED>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT stanza (line+)>
+<!ELEMENT line (#PCDATA)>
+    <!ATTLIST line
+        note CDATA #IMPLIED>

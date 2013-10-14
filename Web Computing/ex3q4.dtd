@@ -1,0 +1,15 @@
+<!ENTITY addressbook ((address | person)*)>
+<!ENTITY address (name?, doornumber, street, (town, city, reigon)+, postcode)>
+    <!ATTLIST address
+        id ID #REQUIRED
+        type ("business" | "personal") "personal"
+        occupants IDREFS #IMPLIED>
+<!ENTITY person (forename, surname, age?, info?)>
+    <!ATTLIST person
+        id ID #REQUIRED
+        type ("business" | "personal") "personal"
+        residences IDREFS #IMPLIED>
+<!ENTITY forename (#PCDATA)>
+<!ENTITY surname (#PCDATA)>
+<!ENTITY age (#PCDATA)>
+<!ENTITY info (#PCDATA)>
