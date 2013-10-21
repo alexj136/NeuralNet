@@ -1,0 +1,32 @@
+Establishing requirements
+=========================
+
+Understand context, users & task
+  Conduct user research
+  Market research
+
+Requirements arise from understanding of user's needs
+
+Functional requirements: What a system should do (or should not do)
+
+Non-functional: How the system should be
+  Constraints or qualities
+  Anything that isn't a functional requirement
+  Performance - speed, data usage etc
+  Scalability
+  Environmental:
+    Dusty/noisy/bright/dark/heat etc
+  Social: privacy, sharing etc
+  Technical ability of user
+
+Stakeholder involvement
+  Stakeholder: Anyone affected by the system or its development
+  Users - primary stakeholders
+  Developers, deployers - secondary
+  Financial benefactors, company shareholders etc - tertiary
+
+Methods
+  Personas
+  Scenarios
+  Use caases
+  Heirarchical task analysis

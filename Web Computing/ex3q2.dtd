@@ -8,3 +8,8 @@
 <!ELEMENT line (#PCDATA)>
     <!ATTLIST line
         note CDATA #IMPLIED>
+
+<xsd:element name="anthology">
+	<xsd:element name="title" type="string"/>
+	<xsd:element name="line" type=""/>
+</xsd:element
