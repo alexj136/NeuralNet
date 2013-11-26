@@ -1,0 +1,11 @@
+Emotional & Social Interaction
+
+User Experience vs Usability:
+How the user 'feels' vs a more concrete scientific idea
+
+Sometimes we want to design for 'negative' emotions
+    - i.e fear, frustration in a video game
+    - This is highly dependent on the application
+
+Usability can conflict with user experience e.g. Microsoft Clippy - potentially
+assists the user but distracts and irritates, spoiling the experience
