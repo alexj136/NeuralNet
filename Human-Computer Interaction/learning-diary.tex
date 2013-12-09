@@ -44,13 +44,46 @@ I think this observation has significant implications for interaction design. It
 \\\indent The second dimension in which we can reason about user research methods is that of \textbf{Behavioural} versus \textbf{Attitudinal} data sources. Attitudinal sources give you information about what people say \& think, whereas behavioural sources yield information about how people actually behave, which can often conflict with attitudinal data. Attitudinal data tends to be used more heavily in marketing, as it is used to understand changes in opinions \& beliefs. Behavioural sources are typically more useful for an interaction designer, as they relate more directly to the effectiveness of a design. A/B testing, eye tracking \& usage statistics collection are typical behavioural research methods, whereas surveys, focus groups \& interviews are typical examples of attitudinal methods.
 \\\indent The last dimension relates to the degree to which a user research method emulates a real-world usage scenario. The closer a method is to a real world scenario, the more reliable the data, generally speaking. However, this is usually offset by an increase in the cost of performing the research. For example, it is very cheap, both in terms of time and money, to put together \& circulate a survey, although they do not usually yield data that tells you how people interact with a product in the real world. Performing a lab usability study, however, while highly time consuming (each participant must be observed) and expensive (participants will typically need to be paid), the data they provide very closely emulates a real world usage scenario. Ethnographic field studies \&,user diaries are highly natural, and provide real-world usage information, whereas surveys \& focus groups are much more decontextualised examples, further from real world usage scenarios.
 
-\section*{Entry 6 - }
+\section*{Entry 6 - Thoughts on Vim}
 
-\section*{Entry 10 - Thoughts on Ubiquitous Computing}
+\noindent Vim is a text editor that has existed in various forms since the early seventies. I have been using it as my main development environment since this August, but for several months prior to this, I had been attempting to learn it, unable to switch from my previous environment - Vim is entirely reliant on commands and key combinations (it runs within the command-line and so does not have any menus etc) and so for an entirely new user to open Vim and just 'start typing' is impossible without constantly referring to documentation. And it is very painful to use any software that requires you to constantly look up how to do something. Vim is a \emph{modal} editor, it has two main modes: normal mode, in which keypresses do not enter text, but submit commands; and insert mode, where typing enters text as normal. Understanding this is a barrier for most people. However, after a couple of months, I saw patterns begin to emerge. Vim commands have two components: \textbf{motions}, which correspond to some movement of the cursor; and \textbf{actions}, which correspond to manipulation of text. Some typical motions are:
+\begin{itemize}
+    \item \textbf{tX} - move \textbf{t}o the next occurrence of the character \textbf{X} (this can be any character, e.g. \textbf{td} moves the cursor to the next occurrence of the character \textbf{d})
+    \item \textbf{b} - move \textbf{b}ack to the beginning of the current word or previous word
+    \item \textbf{\$} - move to the end of the current line
+    \item \textbf{w} - move to the next \textbf{w}ord
+\end{itemize}
+Some common actions are:
+\begin{itemize}
+    \item \textbf{d} - \textbf{d}elete
+    \item \textbf{y} - copy, or '\textbf{y}ank'
+    \item \textbf{c} - \textbf{c}hange
+\end{itemize}
+The real brilliance of Vim is in the way that motions and actions are combined - they can be combined in arbitrary ways for a multitude of possible commands:
+\begin{itemize}
+    \item \textbf{dw} - \textbf{d}elete the next \textbf{w}ord
+    \item \textbf{ct)} - \textbf{c}hange all text up \textbf{t}o the next '\textbf{)}' character
+\end{itemize}
+I find this system to be incredibly effective, and after getting past the initial learning curve, am now much faster at editing text than I was in my previous text editor. I think it is a very elegant system, and would go so far as to say that using Vim is like speaking a language - While it is difficult when one must learn the words and grammar of the language, once a certain level of proficiency is achieved, one can begin to construct sentences of their own, that they have never seen before. I find myself doing this regularly in Vim, constructing commands that are new to me, out of motions and actions that make sense together, and finding that the desired result is achieved.
+\\\indent I would say that Vim provides a level of consistency that no interactive computer application I have ever used can match, and as a result is incredibly efficient and effective.
+
+\section*{Entry 9 - Thoughts on Ubiquitous Computing}
 
 \noindent It is interesting to consider Mark Weiser's vision of the future of computing. We have certainly not yet come close to a realisation of this vision - However I would say that smartphones \& tablets represent progress towards his idea of 'pads'. In his seminal paper, 'The Computer for the 21st Century', his description of the functionality of pads is not too far from modern day tablets. However, in contrast to today's tablets, he describes pads as 'scrap computers, analogous to scrap paper' - this could not be further from today's reality. Tablets tend to be highly personal devices, and are prized highly by their owners, and could almost be described as fashion accessories. Despite this, it is not difficult to imagine that as the cost of these devices drops, this will change, so that we might be able to 'Spread many electronic pads around on the desk, just as you spread out papers' as Weiser describes.
 \\\indent I found the discussion of the appropriateness of the design principles for ubiquitous computing interesting. The image of the 'Flow Blocks' stood out to me in particular as an example of where the design principles break down.
 \\\indent With objects like these flow blocks, the concept of mapping becomes less well defined. Mapping dictates that there should be a clear logical connection between controls and real world results. With the flow blocks, the control mechanism and the real world results are one and the same thing, so essentially we get mapping 'for free' with devices like this.
 \\\indent Constraints also 'come for free' with the flow blocks - it is clear exactly what you cannot do with the blocks simply by their 3D shape - if you cannot fit two blocks together in a certain way, then they are not intended to be connected that way. It seems a similar rule applies for both visibility and feedback also applies. Perhaps this is because the design principles lead us to designs that mimic real world objects like chairs and paper, and so when our interfaces \emph{are} real world objects, they abide by those principles inherently. So perhaps we do need new design principles, not because the existing ones are invalid, but because they are inherent in 3D, real world interfaces, and we should instead focus our attention on design aspects that are not inherent in the nature of the interface.
+
+\section*{Entry 10 - Elysium Guest Lecture}
+
+\noindent It was great to hear about how the UCD principles apply in a real world scenario. I'm more interested in the programming side of things, and so while I don't think UCD will ever be the focus of my career, it will certainly be a consideration throughout. I think for this type of person, as was said in the lecture, it is very important to be aware that:
+\begin{itemize}
+    \item Programmers make terrible personas
+    \item Programmers cannot detect design problems with their own apps
+    \item Things are obvious to programmers that are not obvious to most people
+\end{itemize}
+These are tenets that I will try to carry through my carreer.
+\\\indent It was also valuable to hear about the differences in approach to UCD for different types of company. It is important to be aware that a large company that exists to make profit for shareholders, will only take an interest in UCD as far as it is profitable - They would typically not be interested in improving user experience on products once those products no longer drive profits. Smaller companies, however, would be more likely to invest more time in UCD, and software development companies in particular will find the UCD process to be vital to their everyday work.
+\\\indent As someone who finds reading difficult, I was pleased to hear that Elysium do not use traditional requirements \& design documents, but use prototypes and sketches heavily. This is a practice I think I would find both more effective and much easier. I also found it interesting to hear that the UCD principles can generalise to many aspects of business, such as person to person interaction.
 
 \end{document}
