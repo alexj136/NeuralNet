@@ -36,6 +36,12 @@ possibleLabellings = map (zip trainingData)
 -- an instances to classes. We also take an integer parameter that is the number
 -- of iterations we've done, and return this in a tuple with the learned
 -- function.
---learnPerceptron :: Int -> [Weight] -> [LabelledInstance] -> Float -> (Int, (Input -> Class))
---learnPerceptron iterNo weights trainingInstances learningRate =
-    --let converged = false in
+learnPerceptron :: Int -> [Weight] -> [LabelledInstance] -> Float -> (Int, (Input -> Class))
+learnPerceptron iterNo weights trainingInstances learningRate =
+    if weights == newWeights then
+        weights
+    else
+        learnPerceptron (iterNo + 1) newWeights trainingInstances learningRate
+    where
+    newWeights :: [Weight]
+    newWeights = someFunction
