@@ -63,15 +63,15 @@ learnPerceptron iterNo weights trainingInstances learningRate =
 --}
 
 -- Implementation of the Perceptron Criterion error function
---errorPerc :: Weights -> [ClassifiedInstance] -> Float
+errorPerc :: Weights -> [ClassifiedInstance] -> Float
 errorPerc weights classifiedInstances = (-1) *
     ( sum
-        ( ( \x -> fst x * snd x )
+        ( map ( \x -> fst x * fromIntegral (snd x) )
             ( zip
                 ( map (applyWeights weights)
                     ( map getInstance wronglyClassifiedInstances )
                 )
-                ( map toInt ( snd wronglyClassifiedInstances )
+                ( map toInt ( map snd wronglyClassifiedInstances )
                 )
             )
         )
