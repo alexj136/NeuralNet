@@ -59,19 +59,21 @@ labelCombos = let pn = [Pos, Neg] in [[a, b, c, d] |
 possibleLabellings :: [[LabelledInstance]]
 possibleLabellings = map (zip trainingData) labelCombos
 
--- To learn a perceptron , we need initial weights, some training instances
--- (the [ClassifiedInstance]s), a learning rate, and the error for the previous
--- weights. The output is the learned weights, and the number of iterations. We
--- also take an integer parameter that is the number of iterations we've done,
--- and return this in a tuple with the learned weights.
--- BATCH VERSION
-learnPerceptron :: Int -> Weights -> [ClassifiedInstance] ->
-    Float -> Float -> (Int, Weights)
-learnPerceptron iterNo weights classifiedInstances learnRate prevError =
-    if changeInError < 0.001 && changeInError > -0.001 then
+-- Perform gradient descent learning (batch version)
+gradDescentB ::
+    Int                  -> -- The number of iterations (0 from external calls)
+    Weights              -> -- The initial weights
+    [ClassifiedInstance] -> -- The instances with labels and initial classes
+    Float                -> -- The learning rate
+    Float                -> -- The error in the previous recursive call, which
+                            -- is used to calculate the change in error
+        (Int, Weights)      -- Return value is the number of iterations and the
+                            -- learned weights
+gradDescentB iterNo weights classifiedInstances learnRate prevError
+    | changeInError < 0.00001 && changeInError > -0.00001 =
         (iterNo, weights)
-    else
-        learnPerceptron (iterNo + 1) newWeights newClassifiedInstances
+    | otherwise =
+        gradDescentB (iterNo + 1) newWeights newClassifiedInstances
             learnRate currentError
     where
     newClassifiedInstances :: [ClassifiedInstance]
@@ -79,16 +81,13 @@ learnPerceptron iterNo weights classifiedInstances learnRate prevError =
         map (classifyInstance newWeights) (map fst classifiedInstances)
     newWeights :: Weights
     newWeights = map (\x -> x - (learnRate * changeInError)) weights
-    {--newWeights = (
-        (w1val weights) - (learnRate * changeInError) ,
-        (w2val weights) - (learnRate * changeInError) )--}
     currentError, changeInError :: Float
-    currentError = errorPerc weights classifiedInstances
+    currentError = errorPC weights classifiedInstances
     changeInError = currentError - prevError
 
 -- Implementation of the Perceptron Criterion error function
-errorPerc :: Weights -> [ClassifiedInstance] -> Float
-errorPerc weights classifiedInstances = (-1) *
+errorPC :: Weights -> [ClassifiedInstance] -> Float
+errorPC weights classifiedInstances = (-1) *
     ( sum
         ( map ( \x -> fst x * fromIntegral (snd x) )
             ( zip
@@ -109,7 +108,9 @@ classifyInstance w li = (li, (getClassOfInstance w (fst li)))
 
 -- Determine the class of an Instance based on the given weights
 getClassOfInstance :: Weights -> Instance -> Class
-getClassOfInstance w x = if (applyWeights w x) >= 0 then Pos else Neg
+getClassOfInstance w x
+    | (applyWeights w x) >= 0 = Pos
+    | otherwise               = Neg
 
 -- Apply a weight vector to an instance - essentially the dot product for two
 -- vectors.
@@ -117,6 +118,9 @@ applyWeights :: Weights -> Instance -> Float
 applyWeights w x
     | length w /= 1 + length x =
         error "Mismatch in dimensions of weights & values"
-    | otherwise = (bias w) + 
-        ((w1val w) * (fromIntegral (x1val x))) +
-        ((w2val w) * (fromIntegral (x2val x)))
+    | otherwise = (bias w) +
+        ( sum
+            ( map
+                ( \x -> (fst x) * fromIntegral (snd x) )
+                ( zip (tail w) x )
+        ))
