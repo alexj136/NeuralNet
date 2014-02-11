@@ -10,19 +10,31 @@ toInt :: Class -> Int
 toInt Pos = 1
 toInt Neg = -1
 
--- Our inputs are pairs of integers, an x1 and an x2 value
-type Instance = (Int, Int)
+-- Our inputs are lists of integers, which for this assignment are always two
+-- elements long
+type Instance = [Int]
 
 -- retrieve the x1 and x2 values from an instance
 x1val, x2val :: Instance -> Int
-x1val = fst
-x2val = snd
+x1val i = i !! 0
+x2val i = i !! 1
 
--- Our weights are floats
-type Weights = (Float, Float)
+-- Our weights are lists of floats, the first element being the bias and the
+-- following elements being the weights of the inputs
+type Weights = [Float]
+
+-- Retrieve the w1, w2 and bias values from a Weights datum
+bias, w1val, w2val :: Weights -> Float
+bias w  = w !! 0
+w1val w = w !! 1
+w2val w = w !! 2
 
 -- Represents a labelled data instance
 type LabelledInstance = (Instance, Class)
+
+-- Retrieve the underlying Instance from a LabelledInstance
+getInstFromLI :: LabelledInstance -> Instance
+getInstFromLI = fst
 
 -- Represents a labelled data instance that has been assigned a class by a
 -- classifier
@@ -33,11 +45,11 @@ wronglyClassified :: ClassifiedInstance -> Bool
 wronglyClassified i = snd i /= snd (fst i)
 
 -- Retrieve the underlying instance from within a ClassifiedInstance
-getInstance :: ClassifiedInstance -> Instance
-getInstance = fst . fst
+getInstFromCI :: ClassifiedInstance -> Instance
+getInstFromCI = fst . fst
 
 trainingData :: [Instance]
-trainingData = [(x1, x2) | x1 <- [0, 1], x2 <- [0, 1]]
+trainingData = [[x1, x2] | x1 <- [0, 1], x2 <- [0, 1]]
 
 labelCombos :: [[Class]]
 labelCombos = let pn = [Pos, Neg] in [[a, b, c, d] |
@@ -55,9 +67,9 @@ possibleLabellings = map (zip trainingData) labelCombos
 -- BATCH VERSION
 learnPerceptron :: Int -> Weights -> [ClassifiedInstance] ->
     Float -> Float -> (Int, Weights)
-learnPerceptron iterNo (w1, w2) classifiedInstances learnRate prevError =
+learnPerceptron iterNo weights classifiedInstances learnRate prevError =
     if changeInError < 0.001 && changeInError > -0.001 then
-        (iterNo, (w1, w2))
+        (iterNo, weights)
     else
         learnPerceptron (iterNo + 1) newWeights newClassifiedInstances
             learnRate currentError
@@ -66,11 +78,12 @@ learnPerceptron iterNo (w1, w2) classifiedInstances learnRate prevError =
     newClassifiedInstances =
         map (classifyInstance newWeights) (map fst classifiedInstances)
     newWeights :: Weights
-    newWeights = (
-        w1 - (learnRate * changeInError) ,
-        w2 - (learnRate * changeInError) )
+    newWeights = map (\x -> x - (learnRate * changeInError)) weights
+    {--newWeights = (
+        (w1val weights) - (learnRate * changeInError) ,
+        (w2val weights) - (learnRate * changeInError) )--}
     currentError, changeInError :: Float
-    currentError = errorPerc (w1, w2) classifiedInstances
+    currentError = errorPerc weights classifiedInstances
     changeInError = currentError - prevError
 
 -- Implementation of the Perceptron Criterion error function
@@ -80,13 +93,10 @@ errorPerc weights classifiedInstances = (-1) *
         ( map ( \x -> fst x * fromIntegral (snd x) )
             ( zip
                 ( map (applyWeights weights)
-                    ( map getInstance wronglyClassifiedInstances )
+                    ( map getInstFromCI wronglyClassifiedInstances )
                 )
                 ( map toInt ( map snd wronglyClassifiedInstances )
-                )
-            )
-        )
-    )
+    ))))
     where
     wronglyClassifiedInstances :: [ClassifiedInstance]
     wronglyClassifiedInstances = filter wronglyClassified classifiedInstances
@@ -95,15 +105,18 @@ errorPerc weights classifiedInstances = (-1) *
 -- Make a ClassifiedInstance from a LabelledInstance by determining its Class
 -- from the given weights, and returning the LabelledInstance & Class together
 classifyInstance :: Weights -> LabelledInstance -> ClassifiedInstance
-classifyInstance w i = (i, (getClassOfInstance w (fst i)))
+classifyInstance w li = (li, (getClassOfInstance w (fst li)))
 
 -- Determine the class of an Instance based on the given weights
 getClassOfInstance :: Weights -> Instance -> Class
-getClassOfInstance w i = if (applyWeights w i) >= 0 then Pos else Neg
+getClassOfInstance w x = if (applyWeights w x) >= 0 then Pos else Neg
 
 -- Apply a weight vector to an instance - essentially the dot product for two
 -- vectors.
 applyWeights :: Weights -> Instance -> Float
-applyWeights w i = (+)
-    ((fst w) * (fromIntegral (fst i)))
-    ((snd w) * (fromIntegral (snd i)))
+applyWeights w x
+    | length w /= 1 + length x =
+        error "Mismatch in dimensions of weights & values"
+    | otherwise = (bias w) + 
+        ((w1val w) * (fromIntegral (x1val x))) +
+        ((w2val w) * (fromIntegral (x2val x)))
