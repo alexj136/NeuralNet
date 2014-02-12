@@ -60,19 +60,19 @@ labelCombos = let pn = [Pos, Neg] in [[a, b, c, d] |
 
 possibleLabellings :: [[LabelledInstance]]
 possibleLabellings = map (zip trainingData) labelCombos
-{--
+
 -- Perform gradient descent learning (batch version)
 gradDescentB ::
     Int                  -> -- The number of iterations (0 from external calls)
     Weights              -> -- The initial weights
     [ClassifiedInstance] -> -- The instances with labels and initial classes
     Float                -> -- The learning rate
-    Float                -> -- The error in the previous recursive call, which
+    [Float]              -> -- The error in the previous recursive call, which
                             -- is used to calculate the change in error
         (Int, Weights)      -- Return value is the number of iterations and the
                             -- learned weights
 gradDescentB iterNo weights classifiedInstances learnRate prevError
-    | changeInError < 0.00001 && changeInError > -0.00001 =
+    | sum changeInError < 0.00001 && sum changeInError > -0.00001 =
         (iterNo, weights)
     | otherwise =
         gradDescentB (iterNo + 1) newWeights newClassifiedInstances
@@ -82,16 +82,17 @@ gradDescentB iterNo weights classifiedInstances learnRate prevError
     newClassifiedInstances =
         map (classifyInstance newWeights) (map fst classifiedInstances)
     newWeights :: Weights
-    newWeights = map (\x -> x - (learnRate * changeInError)) weights
-    currentError, changeInError :: Float
+    newWeights =
+        map (\x -> (fst x) - (learnRate * (snd x))) (zip weights changeInError)
+    currentError, changeInError :: [Float]
     currentError = errorPC weights classifiedInstances
-    changeInError = currentError - prevError
---}
+    changeInError = zipWith (-) currentError prevError
+
 -- Implementation of the Perceptron Criterion error function
 errorPC :: Weights -> [ClassifiedInstance] -> [Float]
 errorPC weights classifiedInstances = map ((*) (-1))
     ( map sum
-        ( map ( map ( \x -> fst x * (fst (snd x)) * (snd (snd x)) ) )
+        ( map ( map ( \x -> fst x * (fst (snd x)) * ((fromIntegral . snd . snd) x) ) )
             ( map passToAll
                 ( zip weights
                     ( map
@@ -117,8 +118,7 @@ errorPC weights classifiedInstances = map ((*) (-1))
     -- of tuples where the first element is that a, and the second element is
     -- the nth b element
     passToAll :: (a, [b]) -> [(a, b)]
-    passToAll = \x -> map (\y -> (fst x, y)) snd x
-
+    passToAll (elem, lst) = map (\y -> (elem, y)) lst
 
 -- Make a ClassifiedInstance from a LabelledInstance by determining its Class
 -- from the given weights, and returning the LabelledInstance & Class together
