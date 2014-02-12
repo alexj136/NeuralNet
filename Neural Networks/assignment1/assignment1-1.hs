@@ -1,3 +1,5 @@
+import Data.List (transpose)
+
 -- 2-class problem, so we have a positive and a negative class
 data Class = Pos | Neg
     deriving Eq
@@ -6,9 +8,9 @@ instance Show Class where
     show Pos = "+"
     show Neg = "-"
 
-toInt :: Class -> Int
-toInt Pos = 1
-toInt Neg = -1
+toFloat :: Class -> Float
+toFloat Pos = 1.0
+toFloat Neg = -1.0
 
 -- Our inputs are lists of integers, which for this assignment are always two
 -- elements long
@@ -58,7 +60,7 @@ labelCombos = let pn = [Pos, Neg] in [[a, b, c, d] |
 
 possibleLabellings :: [[LabelledInstance]]
 possibleLabellings = map (zip trainingData) labelCombos
-
+{--
 -- Perform gradient descent learning (batch version)
 gradDescentB ::
     Int                  -> -- The number of iterations (0 from external calls)
@@ -84,21 +86,38 @@ gradDescentB iterNo weights classifiedInstances learnRate prevError
     currentError, changeInError :: Float
     currentError = errorPC weights classifiedInstances
     changeInError = currentError - prevError
-
+--}
 -- Implementation of the Perceptron Criterion error function
-errorPC :: Weights -> [ClassifiedInstance] -> Float
-errorPC weights classifiedInstances = (-1) *
-    ( sum
-        ( map ( \x -> fst x * fromIntegral (snd x) )
-            ( zip
-                ( map (applyWeights weights)
-                    ( map getInstFromCI wronglyClassifiedInstances )
+errorPC :: Weights -> [ClassifiedInstance] -> [Float]
+errorPC weights classifiedInstances = map ((*) (-1))
+    ( map sum
+        ( map ( map ( \x -> fst x * (fst (snd x)) * (snd (snd x)) ) )
+            ( map passToAll
+                ( zip weights
+                    ( map
+                        ( zip ( map toFloat ( map snd wronglyClassifiedInstances ) ) )
+                        allXiVals
+                    )
                 )
-                ( map toInt ( map snd wronglyClassifiedInstances )
-    ))))
+            )
+        )
+    )
     where
+    allXiVals :: [[Int]]
+    allXiVals =
+        biasVector : transpose (map getInstFromCI wronglyClassifiedInstances)
+
     wronglyClassifiedInstances :: [ClassifiedInstance]
     wronglyClassifiedInstances = filter wronglyClassified classifiedInstances
+
+    biasVector :: [Int] -- All values in biasVector are 1
+    biasVector = [1 | _ <- [1..(length classifiedInstances)]]
+
+    -- Takes a tuple containing a single a, and a list of bs, and returns a list
+    -- of tuples where the first element is that a, and the second element is
+    -- the nth b element
+    passToAll :: (a, [b]) -> [(a, b)]
+    passToAll = \x -> map (\y -> (fst x, y)) snd x
 
 
 -- Make a ClassifiedInstance from a LabelledInstance by determining its Class
