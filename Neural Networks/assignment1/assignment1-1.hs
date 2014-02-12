@@ -63,34 +63,33 @@ possibleLabellings = map (zip trainingData) labelCombos
 
 -- Perform gradient descent learning (batch version)
 gradDescentB ::
-    Int                  -> -- The number of iterations (0 from external calls)
-    Weights              -> -- The initial weights
-    [ClassifiedInstance] -> -- The instances with labels and initial classes
-    Float                -> -- The learning rate
-    [Float]              -> -- The error in the previous recursive call, which
-                            -- is used to calculate the change in error
-        (Int, Weights)      -- Return value is the number of iterations and the
-                            -- learned weights
-gradDescentB iterNo weights classifiedInstances learnRate prevError
-    | sum changeInError < 0.00001 && sum changeInError > -0.00001 =
+    Int                -> -- The number of iterations (0 from external calls)
+    Weights            -> -- The initial weights
+    [LabelledInstance] -> -- The instances with labels
+    Float              -> -- The learning rate
+    [Float]            -> -- The error in the previous recursive call, which
+                          -- is used to calculate the change in error
+        (Int, Weights)    -- Return value is the number of iterations and the
+                          -- learned weights
+gradDescentB iterNo weights labelledInstances learnRate prevError
+    | sum changeInError < 0.001 && sum changeInError > -0.001 =
         (iterNo, weights)
     | otherwise =
-        gradDescentB (iterNo + 1) newWeights newClassifiedInstances
+        gradDescentB (iterNo + 1) newWeights labelledInstances
             learnRate currentError
     where
-    newClassifiedInstances :: [ClassifiedInstance]
-    newClassifiedInstances =
-        map (classifyInstance newWeights) (map fst classifiedInstances)
+    classifiedInstances :: [ClassifiedInstance]
+    classifiedInstances =
+        map (classifyInstance newWeights) labelledInstances
     newWeights :: Weights
-    newWeights =
-        map (\x -> (fst x) - (learnRate * (snd x))) (zip weights changeInError)
+    newWeights = zipWith (\w e -> w - (learnRate * e)) weights changeInError
     currentError, changeInError :: [Float]
-    currentError = errorPC weights classifiedInstances
+    currentError = errorPC weights labelledInstances
     changeInError = zipWith (-) currentError prevError
 
 -- Implementation of the Perceptron Criterion error function
-errorPC :: Weights -> [ClassifiedInstance] -> [Float]
-errorPC weights classifiedInstances = map ((*) (-1))
+errorPC :: Weights -> [LabelledInstance] -> [Float]
+errorPC weights labelledInstances = map ((*) (-1))
     ( map sum
         ( map ( map ( \x -> fst x * (fst (snd x)) * ((fromIntegral . snd . snd) x) ) )
             ( map passToAll
@@ -98,21 +97,17 @@ errorPC weights classifiedInstances = map ((*) (-1))
                     ( map
                         ( zip ( map toFloat ( map snd wronglyClassifiedInstances ) ) )
                         allXiVals
-                    )
-                )
-            )
-        )
-    )
+    )))))
     where
     allXiVals :: [[Int]]
     allXiVals =
         biasVector : transpose (map getInstFromCI wronglyClassifiedInstances)
 
     wronglyClassifiedInstances :: [ClassifiedInstance]
-    wronglyClassifiedInstances = filter wronglyClassified classifiedInstances
+    wronglyClassifiedInstances = filter wronglyClassified (map (\x -> (x, getClassOfInstance weights (getInstFromLI x))) labelledInstances)
 
     biasVector :: [Int] -- All values in biasVector are 1
-    biasVector = [1 | _ <- [1..(length classifiedInstances)]]
+    biasVector = [1 | _ <- [1..(length labelledInstances)]]
 
     -- Takes a tuple containing a single a, and a list of bs, and returns a list
     -- of tuples where the first element is that a, and the second element is
