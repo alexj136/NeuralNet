@@ -37,18 +37,23 @@ class Weights:
         return ''.join(['BIAS: ', str(self.bias), ', WEIGHTS: ',
             str(self.weights)])
 
-def learn_perceptron(training_instances,
-        wts = Weights(0.0, [0.0, 0.0]), learning_rate = 0.1):
+def learn_perceptron(
+          training_instances
+        , wts = Weights(0.0, [0.0, 0.0])
+        , learning_rate = 0.1
+        , iteration_cap = 100
+        ):
     '''
     Learn a perceptron from the given training instances. If the default weights
     are used, then the given instances must be 2-dimensional.
     '''
 
     converged = False
+    iterations = 0
+    while not converged and iterations < iteration_cap:
 
-    while not converged:
-        
         converged = True
+        iterations = iterations + 1
 
         for inst in training_instances:
             if classify(wts, inst) is not inst.label:
@@ -58,7 +63,7 @@ def learn_perceptron(training_instances,
                             learning_rate * inst.data[i] * inst.label)
                 wts.bias = wts.bias + (learning_rate * inst.label)
 
-    return wts
+    return (wts, iterations)
 """
 def error(wts, insts):
     '''
@@ -106,33 +111,44 @@ def dot(x, y):
 
     return sum(map(lambda xi, yi: xi * yi, x, y))
 
+def doPartA1():
+    instance_sets = [
+        [ Instance([0, 0], POSITIVE)
+        , Instance([1, 0], POSITIVE)
+        , Instance([0, 1], NEGATIVE)
+        , Instance([1, 1], NEGATIVE)
+        ],
+        [ Instance([0, 0], POSITIVE)
+        , Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], POSITIVE)
+        , Instance([1, 1], NEGATIVE)
+        ],
+        [ Instance([0, 0], POSITIVE)
+        , Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], NEGATIVE)
+        , Instance([1, 1], POSITIVE)
+        ],
+        [ Instance([0, 0], NEGATIVE)
+        , Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], POSITIVE)
+        , Instance([1, 1], POSITIVE)
+        ],
+        [ Instance([0, 0], NEGATIVE)
+        , Instance([1, 0], POSITIVE)
+        , Instance([0, 1], NEGATIVE)
+        , Instance([1, 1], POSITIVE)
+        ],
+        [ Instance([0, 0], NEGATIVE)
+        , Instance([1, 0], POSITIVE)
+        , Instance([0, 1], POSITIVE)
+        , Instance([1, 1], NEGATIVE)
+        ]]
+    for insts in instance_sets:
+        wts, iters = learn_perceptron(insts)
+        for i in insts:
+            print 'INST: ', i.data, ' LABEL: ', i.label, ', CLASS: ', str(classify(wts, i))
+        print wts, '\n', 'ITERATIONS: ', iters, '\n'
+
+
 if __name__ == "__main__":
-    insts = [ Instance([0, 0], POSITIVE)
-            , Instance([1, 0], NEGATIVE)
-            , Instance([0, 1], POSITIVE)
-            , Instance([1, 1], NEGATIVE)
-            ]
-    wts = learn_perceptron(insts)
-    for i in insts:
-        print 'INST: ', i.data, ' LABEL: ', i.label, ', CLASS: ', str(classify(wts, i))
-    print wts, '\n'
-
-    insts = [ Instance([0, 0], POSITIVE)
-            , Instance([1, 0], POSITIVE)
-            , Instance([0, 1], NEGATIVE)
-            , Instance([1, 1], NEGATIVE)
-            ]
-    wts = learn_perceptron(insts)
-    for i in insts:
-        print 'INST: ', i.data, ' LABEL: ', i.label, ', CLASS: ', str(classify(wts, i))
-    print wts, '\n'
-
-    insts = [ Instance([0, 0], POSITIVE)
-            , Instance([1, 0], NEGATIVE)
-            , Instance([0, 1], NEGATIVE)
-            , Instance([1, 1], POSITIVE)
-            ]
-    wts = learn_perceptron(insts)
-    for i in insts:
-        print 'INST: ', i.data, ' LABEL: ', i.label, ', CLASS: ', str(classify(wts, i))
-    print wts
+    doPartA1()
