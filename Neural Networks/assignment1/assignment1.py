@@ -1,34 +1,25 @@
 #!/bin/python2
+import random
+import matplotlib.pyplot as plot
 
 POSITIVE = 1
 NEGATIVE = -1
 
 class Instance:
-
+    '''
+    An Instance contains:
+        data  - a list of values for each dimension
+        label - the class label
+    '''
     def __init__(self, data, label):
         self.data  = data
         self.label = label
-
-    def datum(self, index):
-        return self.data[index]
-
-    def length(self):
-        return len(self.data)
 
 class Weights:
 
     def __init__(self, bias, weights):
         self.bias    = bias
         self.weights = weights
-
-    def bias(self):
-        return self.bias
-
-    def weight(self, index):
-        return self.weights[index]
-
-    def length(self):
-        return len(self.weights)
 
     def __str__(self):
         '''
@@ -64,36 +55,6 @@ def learn_perceptron(
                 wts.bias = wts.bias + (learning_rate * inst.label)
 
     return (wts, iterations)
-"""
-def error(wts, insts):
-    '''
-    The Perceptron Criterion error function
-    '''
-    wts_errs = [] # List to collect our error values for each dimension
-
-    for i in range(wts.length()):
-        dimension_values = []
-        labels           = []
-
-        for j in range(len(insts)):
-            dimension_values.append(insts[i].data[j])
-            labels.append(insts[i].label)
-
-        wts_errs.append(error_single_dimension(wts.weights[i], dimension_values, labels))
-
-    bias_err = error_single_dimension(wts.bias, [1 for i in insts], labels)
-    return Weights(bias_err, wts_errs)
-
-def error_single_dimension(dimension_weight, dimension_values, labels):
-    '''
-    The Perceptron Criterion error function for a single dimension
-    '''
-    if len(dimension_values) is not len(labels):
-        raise Exception('Mismatched number of instances and labels in error()')
-
-    return sum([labels [i] * dimension_values[i] * dimension_weight
-        for i in range(len(dimension_values))])
-"""
 
 def classify(wts, inst):
     '''
@@ -149,6 +110,28 @@ def doPartA1():
             print 'INST: ', i.data, ' LABEL: ', i.label, ', CLASS: ', str(classify(wts, i))
         print wts, '\n', 'ITERATIONS: ', iters, '\n'
 
+def doPart1B():
+    # Generate random data as specified:
+    posX1vals = [random.gauss(0, 1) for x in range(20)]
+    posX2vals = [random.gauss(0, 1) for x in range(20)]
+    negX1vals = [random.gauss(4, 1) for x in range(20)]
+    negX2vals = [random.gauss(0, 1) for x in range(20)]
+    insts = []
+    for i in range(20):
+        insts.append(Instance([posX1vals[i], posX2vals[i]], POSITIVE))
+        insts.append(Instance([negX1vals[i], negX2vals[i]], NEGATIVE))
+
+    # Train the perceptron
+    wts, instances = learn_perceptron(insts)
+
+    # Generate two points on the decision boundary that we can use to draw the line
+    linex2s = [3.0, -3.0]
+    linex1s = [-1 * (wts.bias + (x2 * wts.weights[1]))/wts.weights[0] for x2 in linex2s]
+
+    # Plot the points & line
+    plot.plot(posX1vals, posX2vals, 'r^', negX1vals, negX2vals, 'b^', linex1s, linex2s, linewidth=1.0)
+    plot.show()
 
 if __name__ == "__main__":
     doPartA1()
+    doPart1B()
