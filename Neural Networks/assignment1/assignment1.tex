@@ -6,11 +6,31 @@
 \begin{document}
 \maketitle
 
+\section*{Introduction}
+This report will detail the implementation of a single layer perceptron for the purposes of binary classification and linear regression.
+
 \section*{Part A: Classification}
 \subsection*{Question 1}
+\subsubsection*{Training Procedure}
+The training procedure is as follows:
+
+\begin{verbatim}
+    Procedure LearnPerceptron (trainingData, weights, learningRate):
+        while procedure not converged:
+            for each incorrectly classified instance in trainingData:
+                update weights in proportion to learningRate so
+                instance is (closer to being) correctly classified
+        output weights
+\end{verbatim}
+
+\subsubsection*{Learnable Patterns}
+The single layer perceptron can learn four of the six given patterns. The ones that cannot be learnt cannot be learnt as they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other.
+
 \subsection*{Question 2}
+
 \section*{Part B: Regression}
 \subsection*{Question 1}
+
 \subsection*{Question 2}
 
 \end{document}
