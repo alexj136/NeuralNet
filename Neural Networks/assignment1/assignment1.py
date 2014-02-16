@@ -179,7 +179,7 @@ def doPartB2():
     pass
 
 if __name__ == "__main__":
-    #doPartA1()
+    doPartA1()
     #doPartA2()
-    doPartB1()
+    #doPartB1()
     #doPartB2()

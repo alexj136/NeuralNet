@@ -24,7 +24,33 @@ The training procedure is as follows:
 \end{verbatim}
 
 \subsubsection*{Learnable Patterns}
-The single layer perceptron can learn four of the six given patterns. The ones that cannot be learnt cannot be learnt as they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other.
+The single layer perceptron can learn four of the six given patterns:
+\\\\
+\begin{tabular}{ l | c c c | l | c c c }
+            & X1 & X2 & Label &         & X1 & X2 & Label \\
+    \hline
+    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
+    Set 1   & 1  & 0  & -     & Set 2   & 1  & 0  & +     \\
+            & 0  & 1  & +     &         & 0  & 1  & -     \\
+            & 0  & 0  & -     &         & 0  & 0  & +     \\
+    \hline
+    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & +     \\
+    Set 3   & 1  & 0  & +     & Set 4   & 1  & 0  & +     \\
+            & 0  & 1  & -     &         & 0  & 1  & -     \\
+            & 0  & 0  & -     &         & 0  & 0  & -     \\
+\end{tabular}
+\\\\
+Pattern sets 1 \& 2 are equivalent modulo the choice of class names. In theory this means that they should be learnable with equal numbers of iterations, however this is not the case in practice. This is because in practice, we represent class with a number (1 for positive, -1 for negative) that is used in the learning algorithm's calculations to determine the sign of a term, thereby causing, as appropriate, an increase or decrease the value of weights in order to move the decision boundary in such a way as to favour the instance. \textbf{REVISE}. The ones that cannot be learnt cannot be learnt as they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
+\\\\
+\begin{tabular}{ l | c c c | l | c c c }
+            & X1 & X2 & Label &         & X1 & X2 & Label \\
+    \hline
+    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
+    Set 5   & 1  & 0  & -     & Set 6   & 1  & 0  & +     \\
+            & 0  & 1  & -     &         & 0  & 1  & +     \\
+            & 0  & 0  & +     &         & 0  & 0  & -     \\
+\end{tabular}
+\\\\
 
 \subsection*{Question 2}
 
