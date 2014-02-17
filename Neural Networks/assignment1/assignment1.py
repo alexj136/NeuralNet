@@ -50,7 +50,7 @@ def learn_perceptron(
         iterations = iterations + 1
 
         for inst in training_instances:
-            if classify(wts, inst) is not inst.label:
+            if classify(wts, inst) != inst.label:
                 converged = False
                 for i in range(len(wts.weights)):
                     wts.weights[i] = wts.weights[i] + (
@@ -58,7 +58,7 @@ def learn_perceptron(
                 wts.bias = wts.bias + (learning_rate * inst.label)
 
     return (wts, iterations)
-"""
+
 def learn_regressor(
           training_instances
         , wts = Weights(0.0, [0.0, 0.0])
@@ -66,44 +66,37 @@ def learn_regressor(
         , iteration_cap = 100
         ):
     iterations = 0
-
-    error     = None
-    min_error = None
-    while iterations < iteration_cap:# and error <= min_error:
-        iterations = iterations + 1
-
-        # Calculate the current error, and if we've improved, set min_error
-        # equal to the current error. We stop iterating when we don't improve.
-        error = sum([dot(wts.weights, i.data) + wts.bias for i in training_instances])
-        errs = [sum([w * i for w in wts.weights]) for i in training_instances]
-        if error < min_error: min_error = error
-
-        for inst in training_instances:
-            for i in range(len(wts.weights)):
-                wts.weights[i] = wts.weights[i] - (learning_rate * (wts.weights[i] - inst.data[i]))
-            wts.bias = wts.bias + ((learning_rate * classify(wts, inst))/len(inst.data))
-
-    return (wts, iterations)
-"""
-def keller_learn_regressor(
-          training_instances
-        , wts = Weights(0.0, [0.0, 0.0])
-        , learning_rate = 0.1
-        , iteration_cap = 100
-        ):
-    iterations = 0
+    num_insts = len(training_instances)
 
     while iterations < iteration_cap:
 
         iterations = iterations + 1
 
         new_wts = wts.copy()
+        new_wts.bias = wts.bias - (learning_rate * (sum([dot(wts.weights, inst.data) + wts.bias - inst.label for inst in training_instances])/num_insts))
         for i in range(len(wts.weights)):
-            new_wts[i] = wts[i] - ((sum([(dot(wts.weights, inst) + wts.bias) * inst.data[i] for inst in training_instances])/len(training_instances))
+            new_wts.weights[i] = wts.weights[i] - (learning_rate * (sum([(dot(wts.weights, inst.data) + wts.bias - inst.label) * inst.data[i] for inst in training_instances])/num_insts))
 
-        new_wts.bias = wts.bias - (sum([dot(wts.weights, inst) + wts.bias for inst in training_instances])/len(training_instances))
 
-    return weights, iterations
+        # Conclude if the weights have converged
+        if converged(wts, new_wts, 0.1): break
+
+        wts = new_wts
+
+    return new_wts, iterations
+
+def converged(wts1, wts2, threshold):
+    '''
+    Compare two weight sets to see if a weight updating algorithm has converged.
+    The threshold represents an allowed degree of deviation in the given weights
+    such that convergence is still indicated
+    '''
+    if len(wts1.weights) != len(wts2.weights):
+        raise Exception(
+                'Mismatched dimensions for weights & instance in converged()')
+    diffs = [abs(wts1.weights[i] - wts2.weights[i]) for i in range(len(wts1.weights))]
+    diffs.append(abs(wts1.bias - wts2.bias))
+    return max(diffs) < threshold
 
 def classify(wts, inst):
     '''
@@ -123,35 +116,23 @@ def dot(x, y):
 
 def doPartA1():
     instance_sets = [
-        [ Instance([0, 0], POSITIVE)
-        , Instance([1, 0], POSITIVE)
-        , Instance([0, 1], NEGATIVE)
-        , Instance([1, 1], NEGATIVE)
+        [ Instance([0, 0], POSITIVE), Instance([1, 0], POSITIVE)
+        , Instance([0, 1], NEGATIVE), Instance([1, 1], NEGATIVE)
         ],
-        [ Instance([0, 0], POSITIVE)
-        , Instance([1, 0], NEGATIVE)
-        , Instance([0, 1], POSITIVE)
-        , Instance([1, 1], NEGATIVE)
+        [ Instance([0, 0], POSITIVE), Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], POSITIVE), Instance([1, 1], NEGATIVE)
         ],
-        [ Instance([0, 0], POSITIVE)
-        , Instance([1, 0], NEGATIVE)
-        , Instance([0, 1], NEGATIVE)
-        , Instance([1, 1], POSITIVE)
+        [ Instance([0, 0], POSITIVE), Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], NEGATIVE), Instance([1, 1], POSITIVE)
         ],
-        [ Instance([0, 0], NEGATIVE)
-        , Instance([1, 0], NEGATIVE)
-        , Instance([0, 1], POSITIVE)
-        , Instance([1, 1], POSITIVE)
+        [ Instance([0, 0], NEGATIVE), Instance([1, 0], NEGATIVE)
+        , Instance([0, 1], POSITIVE), Instance([1, 1], POSITIVE)
         ],
-        [ Instance([0, 0], NEGATIVE)
-        , Instance([1, 0], POSITIVE)
-        , Instance([0, 1], NEGATIVE)
-        , Instance([1, 1], POSITIVE)
+        [ Instance([0, 0], NEGATIVE), Instance([1, 0], POSITIVE)
+        , Instance([0, 1], NEGATIVE), Instance([1, 1], POSITIVE)
         ],
-        [ Instance([0, 0], NEGATIVE)
-        , Instance([1, 0], POSITIVE)
-        , Instance([0, 1], POSITIVE)
-        , Instance([1, 1], NEGATIVE)
+        [ Instance([0, 0], NEGATIVE), Instance([1, 0], POSITIVE)
+        , Instance([0, 1], POSITIVE), Instance([1, 1], NEGATIVE)
         ]]
     for insts in instance_sets:
         wts, iters = learn_perceptron(insts)
@@ -187,17 +168,22 @@ def doPartA2():
     plot.show()
 
 def doPartB1():
+    '''
+    For this regression task, we think of our data as 1-dimensional, and the
+    second dimension is essentially our class label.
+    '''
+
     # y = 0.4*x + 3 + delta, delta = uniform random from -10 to +10
     data = [[x, (0.4 * x) + 3 + random.uniform(-10.0, 10.0)]
             for x in range(1, 200, 2)]
-    insts = [Instance(d, 0) for d in data]
-    wts, iters = learn_regressor(insts)
+    insts = [Instance([d[0]], d[1]) for d in data]
+    wts, iters = learn_regressor(insts, wts=Weights(0.0, [0.0]))
     print wts, 'ITERS:', iters
 
     # Derive 2 points that lie on our learned regressorso that we can plot the
     # line
     linex2s = [0.0, 90.0]
-    linex1s = [((x2 * wts.weights[0]) - wts.bias)/wts.weights[1]
+    linex1s = [wts.weights[0] * x2 + wts.bias
             for x2 in linex2s]
     plot.plot([d[0] for d in data], [d[1] for d in data], 'b^',
             linex1s, linex2s, linewidth=1.0)
