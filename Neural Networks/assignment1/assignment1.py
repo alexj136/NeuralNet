@@ -251,8 +251,8 @@ def doPartB2():
             )
     print wts, 'ITERS:', iters
 
-    # Derive some points that lie on our error surface such that we can draw the
-    # plane nicely
+    # Derive some points that lie on our regressor plane, such that we can draw
+    # the plane nicely
     planeX1s = range(0, 200, 20)
     planeX2s = range(0, 200, 20)
     planeX2s, planeX2s = np.meshgrid(planeX1s, planeX2s)
