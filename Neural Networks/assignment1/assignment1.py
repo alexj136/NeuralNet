@@ -1,6 +1,8 @@
 #!/bin/python2
 import random
 import matplotlib.pyplot as plot
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
 
 POSITIVE = 1
 NEGATIVE = -1
@@ -14,6 +16,12 @@ class Instance:
     def __init__(self, data, label):
         self.data  = data
         self.label = label
+
+    def __str__(self):
+        '''
+        Get a nice string representation of this Instance object
+        '''
+        return ''.join(['DATA: ', str(self.data), ', LABEL: ', str(self.label)])
 
 class Weights:
 
@@ -29,7 +37,7 @@ class Weights:
         Get a nice string representation of this Weights object
         '''
         return ''.join(['BIAS: ', str(self.bias), ', WEIGHTS: ',
-            str(self.weights)])
+                str(self.weights)])
 
 def learn_perceptron(
           training_instances
@@ -88,7 +96,7 @@ def learn_regressor(
 
 
         # Conclude if the weights have converged
-        #if converged(wts, new_wts, convergence_threshold): break
+        if converged(wts, new_wts, convergence_threshold): break
 
         wts = new_wts
 
@@ -196,8 +204,13 @@ def doPartB1():
     data = [[x, (0.4 * x) + 3 + random.uniform(-10.0, 10.0)]
             for x in range(1, 200, 2)]
     insts = [Instance([d[0]], d[1]) for d in data]
-    wts, iters = learn_regressor(insts, wts=Weights(3.0, [0.4]), learning_rate = 0.00015, iteration_cap = 10000)
-    print wts, 'ITERS:', iters
+    wts, iters = learn_regressor(insts
+            , wts=Weights(0.0, [0.0])
+            , learning_rate = 0.00012
+            , iteration_cap = 30000
+            , convergence_threshold = 0.000003
+            )
+    print wts, ', ITERS:', iters
 
     # Derive 2 points that lie on our learned regressorso that we can plot the
     # line
@@ -208,10 +221,33 @@ def doPartB1():
     plot.show()
 
 def doPartB2():
-    pass
+    # y = 0.4*x + 3 + delta, delta = uniform random from -10 to +10
+    data = [[x1, x2, (0.4 * x1) + (1.4 * x2) + random.uniform(-100.0, 100.0)]
+            for x1 in range (1, 200, 20) for x2 in range(1, 200, 20)]
+    insts = [Instance([d[0], d[1]], d[2]) for d in data]
+
+    wts, iters = learn_regressor(insts
+            , wts=Weights(0.0, [0.0, 0.0])
+            , learning_rate = 0.00000012
+            , iteration_cap = 30000
+            , convergence_threshold = 0.000003
+            )
+    print wts, 'ITERS:', iters
+
+    # Derive 2 points that lie on our learned regressorso that we can plot the
+    # line
+    planeX1s = range(0, 200, 20)
+    planeX2s = range(0, 200, 20)
+    planeX2s, planeX2s = np.meshgrid(planeX1s, planeX2s)
+    planeYs = [activation(wts, Instance([planeX1s[i], planeX2s[i]], None)) for i in range(len(planeX1s))]
+    fig = plot.figure()
+    axis = fig.add_subplot(111, projection='3d')
+    axis.scatter([i.data[0] for i in insts], [i.data[1] for i in insts], [i.label for i in insts])
+    axis.plot_wireframe(planeX1s, planeX2s, planeYs)
+    plot.show()
 
 if __name__ == "__main__":
     #doPartA1()
     #doPartA2()
-    doPartB1()
-    #doPartB2()
+    #doPartB1()
+    doPartB2()
