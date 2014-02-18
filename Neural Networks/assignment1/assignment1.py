@@ -1,5 +1,5 @@
 #!/bin/python2
-import random
+import random, math
 import matplotlib.pyplot as plot
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
@@ -47,7 +47,8 @@ def learn_perceptron(
         ):
     '''
     Learn a perceptron from the given training instances. If the default weights
-    are used, then the given instances must be 2-dimensional.
+    are used, then the given instances must be 2-dimensional. The algorithm used
+    is sequential gradient descent.
     '''
 
     converged = False
@@ -58,7 +59,7 @@ def learn_perceptron(
         iterations = iterations + 1
 
         for inst in training_instances:
-            if classify(wts, inst) != inst.label:
+            if heaviside_classify(wts, inst) != inst.label:
                 converged = False
                 for i in range(len(wts.weights)):
                     wts.weights[i] = wts.weights[i] + (
@@ -116,12 +117,28 @@ def converged(wts1, wts2, threshold):
     diffs.append(abs(wts1.bias - wts2.bias))
     return max(diffs) < threshold
 
-def classify(wts, inst):
+def heaviside_classify(wts, inst):
     '''
     Get the class of an instance from the supplied weights using a heaviside
     function
     '''
     return POSITIVE if activation(wts, inst) >= 0 else NEGATIVE
+
+def sigmoid_classify(wts, inst, coefficient=1, use_tanh=False):
+    '''
+    Derive a value that represents both a class (+1 for values greater than 0,
+    -1 for values less than 0) and a degree of certainty for our class decision.
+    The more extreme the value, the more certain our decision is. The closer to
+    0 the value is, the less certain we are.
+        This function will use the hyperbolic tangent function if the use_tanh
+    parameter is given as True (default is False). Otherwise, a sigmoidal
+    function S(t) = 1 / 1 - e^-ax, where a is the (optionally) given
+    coefficient, and x is the dot product of the given weight & instance
+    '''
+    if use_tanh:
+        return np.tanh(activation(wts, inst))
+    else:
+        return 1 / (1 + (math.e ** (-1 * coefficient * activation(wts, inst))))
 
 def activation(wts, inst):
     '''
@@ -164,7 +181,7 @@ def doPartA1():
         wts, iters = learn_perceptron(insts)
         for i in insts:
             print 'INST:', i.data, 'LABEL:', i.label, 'CLASS:', \
-                    str(classify(wts, i))
+                    str(heaviside_classify(wts, i))
         print wts, '\n', 'ITERATIONS: ', iters, '\n'
 
 def doPartA2():
@@ -221,7 +238,7 @@ def doPartB1():
     plot.show()
 
 def doPartB2():
-    # y = 0.4*x + 3 + delta, delta = uniform random from -10 to +10
+    # y = 0.4*x1 + 1.4*x2 + delta, delta = uniform random from -100 to +100
     data = [[x1, x2, (0.4 * x1) + (1.4 * x2) + random.uniform(-100.0, 100.0)]
             for x1 in range (1, 200, 20) for x2 in range(1, 200, 20)]
     insts = [Instance([d[0], d[1]], d[2]) for d in data]
@@ -234,8 +251,8 @@ def doPartB2():
             )
     print wts, 'ITERS:', iters
 
-    # Derive 2 points that lie on our learned regressorso that we can plot the
-    # line
+    # Derive some points that lie on our error surface such that we can draw the
+    # plane nicely
     planeX1s = range(0, 200, 20)
     planeX2s = range(0, 200, 20)
     planeX2s, planeX2s = np.meshgrid(planeX1s, planeX2s)
