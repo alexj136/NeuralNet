@@ -64,6 +64,7 @@ def learn_regressor(
         , wts = Weights(0.0, [0.0, 0.0])
         , learning_rate = 0.1
         , iteration_cap = 100
+        , convergence_threshold = 0.1
         ):
     iterations = 0
     num_insts = len(training_instances)
@@ -73,13 +74,21 @@ def learn_regressor(
         iterations = iterations + 1
 
         new_wts = wts.copy()
-        new_wts.bias = wts.bias - (learning_rate * (sum([dot(wts.weights, inst.data) + wts.bias - inst.label for inst in training_instances])/num_insts))
+
+        # Adjust the bias
+        new_wts.bias = wts.bias - (learning_rate * ( \
+                sum([activation(wts, inst) - inst.label \
+                for inst in training_instances])/num_insts))
+        
+        # Adjust the weight for each dimension
         for i in range(len(wts.weights)):
-            new_wts.weights[i] = wts.weights[i] - (learning_rate * (sum([(dot(wts.weights, inst.data) + wts.bias - inst.label) * inst.data[i] for inst in training_instances])/num_insts))
+            new_wts.weights[i] = wts.weights[i] - (learning_rate * ( \
+                    sum([(activation(wts, inst) - inst.label) * inst.data[i] \
+                    for inst in training_instances])/num_insts))
 
 
         # Conclude if the weights have converged
-        if converged(wts, new_wts, 0.1): break
+        #if converged(wts, new_wts, convergence_threshold): break
 
         wts = new_wts
 
@@ -94,16 +103,25 @@ def converged(wts1, wts2, threshold):
     if len(wts1.weights) != len(wts2.weights):
         raise Exception(
                 'Mismatched dimensions for weights & instance in converged()')
-    diffs = [abs(wts1.weights[i] - wts2.weights[i]) for i in range(len(wts1.weights))]
+    diffs = [abs(wts1.weights[i] - wts2.weights[i]) \
+            for i in range(len(wts1.weights))]
     diffs.append(abs(wts1.bias - wts2.bias))
     return max(diffs) < threshold
 
 def classify(wts, inst):
     '''
-    Get the class of an instance from the supplied weights - essentially the dot
-    product of the instance & weights, plus the bias
+    Get the class of an instance from the supplied weights using a heaviside
+    function
     '''
-    return POSITIVE if dot(wts.weights, inst.data) + wts.bias >= 0 else NEGATIVE
+    return POSITIVE if activation(wts, inst) >= 0 else NEGATIVE
+
+def activation(wts, inst):
+    '''
+    The activation function for a perceptron - the dot product of the weights
+    with the instance's features, plus the bias (although the bias can be seen
+    as the weight on a feature that always has value 1)
+    '''
+    return dot(wts.weights, inst.data) + wts.bias
 
 def dot(x, y):
     '''
@@ -137,7 +155,8 @@ def doPartA1():
     for insts in instance_sets:
         wts, iters = learn_perceptron(insts)
         for i in insts:
-            print 'INST:', i.data, 'LABEL:', i.label, 'CLASS:', str(classify(wts, i))
+            print 'INST:', i.data, 'LABEL:', i.label, 'CLASS:', \
+                    str(classify(wts, i))
         print wts, '\n', 'ITERATIONS: ', iters, '\n'
 
 def doPartA2():
@@ -177,14 +196,13 @@ def doPartB1():
     data = [[x, (0.4 * x) + 3 + random.uniform(-10.0, 10.0)]
             for x in range(1, 200, 2)]
     insts = [Instance([d[0]], d[1]) for d in data]
-    wts, iters = learn_regressor(insts, wts=Weights(0.0, [0.0]))
+    wts, iters = learn_regressor(insts, wts=Weights(3.0, [0.4]), learning_rate = 0.00015, iteration_cap = 10000)
     print wts, 'ITERS:', iters
 
     # Derive 2 points that lie on our learned regressorso that we can plot the
     # line
-    linex2s = [0.0, 90.0]
-    linex1s = [wts.weights[0] * x2 + wts.bias
-            for x2 in linex2s]
+    linex1s = [0, 200]
+    linex2s = [activation(wts, Instance([x1], None)) for x1 in linex1s]
     plot.plot([d[0] for d in data], [d[1] for d in data], 'b^',
             linex1s, linex2s, linewidth=1.0)
     plot.show()
