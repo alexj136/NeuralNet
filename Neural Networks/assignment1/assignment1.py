@@ -239,10 +239,12 @@ def doPartB2():
     planeX1s = range(0, 200, 20)
     planeX2s = range(0, 200, 20)
     planeX2s, planeX2s = np.meshgrid(planeX1s, planeX2s)
-    planeYs = [activation(wts, Instance([planeX1s[i], planeX2s[i]], None)) for i in range(len(planeX1s))]
+    planeYs = [activation(wts, Instance([planeX1s[i], planeX2s[i]], None))
+            for i in range(len(planeX1s))]
     fig = plot.figure()
     axis = fig.add_subplot(111, projection='3d')
-    axis.scatter([i.data[0] for i in insts], [i.data[1] for i in insts], [i.label for i in insts])
+    axis.scatter([i.data[0] for i in insts], [i.data[1] for i in insts],
+            [i.label for i in insts])
     axis.plot_wireframe(planeX1s, planeX2s, planeYs)
     plot.show()
 
