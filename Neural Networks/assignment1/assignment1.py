@@ -225,6 +225,8 @@ def doPartA1():
         # Plot the points & line
         plot.plot(posX2vals, posX1vals, 'r^', negX2vals, negX1vals, 'g^',
                 linex1s, linex2s, linewidth=1.0)
+        plot.xlabel('X1')
+        plot.ylabel('X2')
         plot.ylim([-0.2, 1.2])
         plot.xlim([-0.2, 1.2])
         plot.show()
@@ -311,7 +313,7 @@ def doPartB2():
     plot.show()
 
 if __name__ == "__main__":
-    #doPartA1()
+    doPartA1()
     #doPartA2()
     #doPartB1()
-    doPartB2()
+    #doPartB2()

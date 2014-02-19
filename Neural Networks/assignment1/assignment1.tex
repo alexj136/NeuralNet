@@ -1,4 +1,8 @@
 \documentclass{article}
+\usepackage{algorithm2e}
+\usepackage{graphicx}
+
+\DeclareGraphicsExtensions{.png}
 
 \title{Neural Networks: Assignment 1}
 \author{Candidate Number: 18512}
@@ -12,22 +16,34 @@ This report will detail the implementation of a single layer perceptron for the 
 
 \section*{Part A: Classification}
 \subsection*{Question 1}
-Both sequential \& batch gradient descent algorithms were used in this implementation for the sake of comparison between the two. \\
-In both cases, the Perceptron Criterion error function is used, because unlike more naive error functions, Perceptron Criterion function yields a value proportional to the (sum of the) distance from the decision boundary. This is useful because any change in weights will correspond to a change in the value that the error function yields, which allows us to calculate the gradient of the error function, which in turn allows us to learn the optimum decision boundary via gradient descent. If a change in weights does not correspond to a change in error, we cannot determine whether the weight adjustment improved or worsened our learned function. \\
-Initial weights were all zero as specified in the assignment brief. \\
-The choice of learning rate for this task is not terribly important - it should be large enough that it does not cause the algorithm to do unnecessary extra iterations, and not be so great as to prevent convergence. 0.1 was found to be sufficient.
+Sequential gradient descent was used, as it is somewhat simpler to implement, and for such a simple case, there is no benefit in terms of what we want to demonstrate, to using a more complicated implementation. Batch gradient descent will be used in the latter questions of this assignment, however. \\
+\indent The Perceptron Criterion error function is used in this task, because unlike more naive error functions, Perceptron Criterion function yields a value proportional to the (sum of the) distance from the decision boundary. This is useful because any change in weights will correspond to a change in the value that the error function yields, which allows us to calculate the gradient of the error function, which in turn allows us to learn the optimum decision boundary via gradient descent. If a change in weights does not correspond to a change in error, we cannot determine whether the weight adjustment improved or worsened our learned function. \\
+\indent The choice of learning rate for this task is not terribly important - it should be large enough that it does not cause the algorithm to do unnecessary extra iterations, and not be so great as to prevent convergence. 0.1 was found to be sufficient. \\
+\indent Initial weights were all zero as specified in the assignment brief. \\
 
 \subsubsection*{Training Procedure}
-The training procedure for sequential gradient descent is as follows:
+The training procedure for sequential gradient descent is as follows: \\
 
-\begin{verbatim}
-Procedure GradientDescentSequential(trainingData, weights, learningRate):
-    while procedure not converged:
-        for each incorrectly classified instance in trainingData:
-            update weights in proportion to learningRate so
-            instance is (closer to being) correctly classified
-    output weights
-\end{verbatim}
+\begin{algorithm}[H]{\textbf{Procedure}: GradientDescentSequential} \\
+    \KwIn{trainingData, weights, learningRate}
+    \SetAlgoLined
+    \Begin{
+        \While{any element of trainingData is incorrectly classified} {
+            \For{each instance in trainingData} {
+                \If{instance is correctly classified} {
+                    update weights in proportion to learningRate so instance is (closer to being) correctly classified
+                }
+            }
+        }
+    }
+    \KwResult{weights}
+\end{algorithm}
+\vspace{4mm}
+
+\noindent At the heart of this algorithm is the weight update step. To determine how we will update the weights, we use the Perceptron Criterion error function:
+\[E^{Perc} = -\sum_{i = 1}^{m} \underline{x}_{i} . \underline{y}_{i} t_{i} \hspace{2mm} \textrm{for all misclassified} \hspace{2mm} x_{i}\]
+With batch gradient descent, we can simply update every weight by the amount returned by this error function, multiplied by the learning rate. However, when applying this error function to sequential gradient descent, we get the following update rule:
+\[w_{t+1} = w_{t} + \eta \underline{x}_{i} t_{i}\]
 
 \subsubsection*{Learnable Patterns}
 The implemented single layer perceptron was able to learn four of the six given patterns:
@@ -46,7 +62,7 @@ The implemented single layer perceptron was able to learn four of the six given 
                 & 0  & 0  & -     &         & 0  & 0  & +     \\
     \end{tabular}
 \end{center}
-Pattern sets 1 \& 2 are equivalent modulo the choice of class names, and as a result are learnt in the same number of iterations (3). The same is the case for pattern sets 3 \& 4. The ones that cannot be learnt are just so because they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
+Pattern sets 1 \& 2 are equivalent modulo the choice of class names, and as a result are learnt in the same number of iterations (2). The same is the case for pattern sets 3 \& 4. The ones that cannot be learnt are just so because they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
 \begin{center}
     \begin{tabular}{ l | c c c | l | c c c }
                 & X1 & X2 & Label &         & X1 & X2 & Label \\
@@ -62,15 +78,26 @@ The following table shows the learned weights and number of iterations for each 
     \begin{tabular}{ c | c | c | c | c }
         Pattern Set & Bias & Weight 1 & Weight 2 & Iterations \\
         \hline
-        1           & 0    & -0.2     & 0        & 3          \\
+        1           & 0    & -0.2     & 0        & 2          \\
         \hline
-        2           & -0.1 & 0.2      & 0        & 3          \\
+        2           & -0.1 & 0.2      & 0        & 2          \\
         \hline
-        3           & 0    & 0        & -0.1     & 3          \\
+        3           & 0    & 0        & -0.1     & 2          \\
         \hline
-        4           & -0.1 & 0        & 0.1      & 3          \\
+        4           & -0.1 & 0        & 0.1      & 2          \\
     \end{tabular}
 \end{center}
+
+The graphs below show the state of the decision boundary after each iteration, for pattern set 4: \\
+
+\centerline{\textbf{Initial State}: Bias = 0, W1 = 0, W2 = 0}
+\centerline{\includegraphics[width=200px]{partA1_iter1}}
+\vspace{6mm}
+\centerline{\textbf{After First Iteration}: Bias = 0, W1 = 0, W2 = 0.1}
+\centerline{\includegraphics[width=200px]{partA1_iter2}}
+\vspace{6mm}
+\centerline{\textbf{After Second Iteration} (final state): Bias = -0.1, W1 = 0, W2 = 0.1}
+\centerline{\includegraphics[width=200px]{partA1_iter3}}
 
 \subsection*{Question 2}
 
