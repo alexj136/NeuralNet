@@ -145,7 +145,7 @@ def tanh_classify(wts, inst):
     This function uses the hyperbolic tangent function to obtain a degree of
     certainty for classification, as with sigmoid_classify
     '''
-    return np.tanh(activation(wts, inst))
+    return math.tanh(activation(wts, inst))
 
 
 def activation(wts, inst):
@@ -206,24 +206,24 @@ def doPartA1():
 
     # Illustrate procedure with instance_sets[4] using sequential by showing the
     # graph after each iteration
-    wts_list, iters = grad_desc_sequential(instance_sets[4],
+    wts_list, iters = grad_desc_sequential(instance_sets[3],
             Weights(0.0, [0.0, 0.0]), collect_weights=True)
-    negX1vals = [i.data[0] for i in instance_sets[0] if i.label is NEGATIVE]
-    negX2vals = [i.data[1] for i in instance_sets[0] if i.label is NEGATIVE]
-    posX1vals = [i.data[0] for i in instance_sets[0] if i.label is POSITIVE]
-    posX2vals = [i.data[1] for i in instance_sets[0] if i.label is POSITIVE]
+    negX1vals = [i.data[0] for i in instance_sets[3] if i.label is NEGATIVE]
+    negX2vals = [i.data[1] for i in instance_sets[3] if i.label is NEGATIVE]
+    posX1vals = [i.data[0] for i in instance_sets[3] if i.label is POSITIVE]
+    posX2vals = [i.data[1] for i in instance_sets[3] if i.label is POSITIVE]
     iter_num = 0
     for wts in wts_list:
         iter_num = iter_num + 1
         print 'ITERATION', iter_num, 'OF', iters, ':', wts
         # Generate two points on the decision boundary that we can use to draw
         # the line
-        linex2s = [-0.2, 1.2]
-        linex1s = [-1 * (wts.bias + (x2 * wts.weights[1]))/(wts.weights[0] \
-                if wts.weights[0] != 0 else 0.000000001) for x2 in linex2s]
+        linex1s = [-0.2, 1.2]
+        linex2s = [-1 * (wts.bias + (x1 * wts.weights[1]))/(wts.weights[0] \
+                if wts.weights[0] != 0 else 0.000000001) for x1 in linex1s]
 
         # Plot the points & line
-        plot.plot(posX1vals, posX2vals, 'r^', negX1vals, negX2vals, 'g^',
+        plot.plot(posX2vals, posX1vals, 'r^', negX2vals, negX1vals, 'g^',
                 linex1s, linex2s, linewidth=1.0)
         plot.ylim([-0.2, 1.2])
         plot.xlim([-0.2, 1.2])

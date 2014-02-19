@@ -7,50 +7,65 @@
 \maketitle
 
 \section*{Introduction}
-This report will detail the implementation of a single layer perceptron for the purposes of binary classification and linear regression.
+This report will detail the implementation of a single layer perceptron for the purposes of binary classification and linear regression. \\
+\indent The perceptron was implemented in Python. No Neural Network libraries or toolkits were used. Matplotlib and Numpy were used to produce graphs.
 
 \section*{Part A: Classification}
 \subsection*{Question 1}
 \subsubsection*{Training Procedure}
-The training procedure is as follows:
+The training procedure for sequential gradient descent is as follows:
 
 \begin{verbatim}
-    Procedure GradientDescentSequential (trainingData, weights, learningRate):
-        while procedure not converged:
-            for each incorrectly classified instance in trainingData:
-                update weights in proportion to learningRate so
-                instance is (closer to being) correctly classified
-        output weights
+Procedure GradientDescentSequential(trainingData, weights, learningRate):
+    while procedure not converged:
+        for each incorrectly classified instance in trainingData:
+            update weights in proportion to learningRate so
+            instance is (closer to being) correctly classified
+    output weights
 \end{verbatim}
 
 \subsubsection*{Learnable Patterns}
-The single layer perceptron can learn four of the six given patterns:
-\\\\
-\begin{tabular}{ l | c c c | l | c c c }
-            & X1 & X2 & Label &         & X1 & X2 & Label \\
-    \hline
-    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
-    Set 1   & 1  & 0  & -     & Set 2   & 1  & 0  & +     \\
-            & 0  & 1  & +     &         & 0  & 1  & -     \\
-            & 0  & 0  & -     &         & 0  & 0  & +     \\
-    \hline
-    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & +     \\
-    Set 3   & 1  & 0  & +     & Set 4   & 1  & 0  & +     \\
-            & 0  & 1  & -     &         & 0  & 1  & -     \\
-            & 0  & 0  & -     &         & 0  & 0  & -     \\
-\end{tabular}
-\\\\
-Pattern sets 1 \& 2 are equivalent modulo the choice of class names. In theory this means that they should be learnable with equal numbers of iterations, however this is not the case in practice. This is because in practice, we represent class with a number (1 for positive, -1 for negative) that is used in the learning algorithm's calculations to determine the sign of a term, thereby causing, as appropriate, an increase or decrease the value of weights in order to move the decision boundary in such a way as to favour the instance. \textbf{REVISE}. The ones that cannot be learnt are just so because they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
-\\\\
-\begin{tabular}{ l | c c c | l | c c c }
-            & X1 & X2 & Label &         & X1 & X2 & Label \\
-    \hline
-    Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
-    Set 5   & 1  & 0  & -     & Set 6   & 1  & 0  & +     \\
-            & 0  & 1  & -     &         & 0  & 1  & +     \\
-            & 0  & 0  & +     &         & 0  & 0  & -     \\
-\end{tabular}
-\\\\
+The implemented single layer perceptron was able to learn four of the six given patterns:
+\begin{center}
+    \begin{tabular}{ l | c c c | l | c c c }
+                & X1 & X2 & Label &         & X1 & X2 & Label \\
+        \hline
+        Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
+        Set 1   & 1  & 0  & -     & Set 2   & 1  & 0  & +     \\
+                & 0  & 1  & +     &         & 0  & 1  & -     \\
+                & 0  & 0  & -     &         & 0  & 0  & +     \\
+        \hline
+        Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
+        Set 3   & 1  & 0  & +     & Set 4   & 1  & 0  & -     \\
+                & 0  & 1  & -     &         & 0  & 1  & +     \\
+                & 0  & 0  & -     &         & 0  & 0  & +     \\
+    \end{tabular}
+\end{center}
+Pattern sets 1 \& 2 are equivalent modulo the choice of class names, and as a result are learnt in the same number of iterations (3). The same is the case for pattern sets 3 \& 4. The ones that cannot be learnt are just so because they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
+\begin{center}
+    \begin{tabular}{ l | c c c | l | c c c }
+                & X1 & X2 & Label &         & X1 & X2 & Label \\
+        \hline
+        Pattern & 1  & 1  & +     & Pattern & 1  & 1  & -     \\
+        Set 5   & 1  & 0  & -     & Set 6   & 1  & 0  & +     \\
+                & 0  & 1  & -     &         & 0  & 1  & +     \\
+                & 0  & 0  & +     &         & 0  & 0  & -     \\
+    \end{tabular}
+\end{center}
+The following table shows the learned weights and number of iterations for each set of learnable patterns:
+\begin{center}
+    \begin{tabular}{ c | c | c | c | c }
+        Pattern Set & Bias & Weight 1 & Weight 2 & Iterations \\
+        \hline
+        1           & 0    & -0.2     & 0        & 3          \\
+        \hline
+        2           & -0.1 & 0.2      & 0        & 3          \\
+        \hline
+        3           & 0    & 0        & -0.1     & 3          \\
+        \hline
+        4           & -0.1 & 0        & 0.1      & 3          \\
+    \end{tabular}
+\end{center}
 
 \subsection*{Question 2}
 
