@@ -15,7 +15,7 @@ This report will detail the implementation of a single layer perceptron for the 
 The training procedure is as follows:
 
 \begin{verbatim}
-    Procedure LearnPerceptron (trainingData, weights, learningRate):
+    Procedure GradientDescentSequential (trainingData, weights, learningRate):
         while procedure not converged:
             for each incorrectly classified instance in trainingData:
                 update weights in proportion to learningRate so
@@ -40,7 +40,7 @@ The single layer perceptron can learn four of the six given patterns:
             & 0  & 0  & -     &         & 0  & 0  & -     \\
 \end{tabular}
 \\\\
-Pattern sets 1 \& 2 are equivalent modulo the choice of class names. In theory this means that they should be learnable with equal numbers of iterations, however this is not the case in practice. This is because in practice, we represent class with a number (1 for positive, -1 for negative) that is used in the learning algorithm's calculations to determine the sign of a term, thereby causing, as appropriate, an increase or decrease the value of weights in order to move the decision boundary in such a way as to favour the instance. \textbf{REVISE}. The ones that cannot be learnt cannot be learnt as they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
+Pattern sets 1 \& 2 are equivalent modulo the choice of class names. In theory this means that they should be learnable with equal numbers of iterations, however this is not the case in practice. This is because in practice, we represent class with a number (1 for positive, -1 for negative) that is used in the learning algorithm's calculations to determine the sign of a term, thereby causing, as appropriate, an increase or decrease the value of weights in order to move the decision boundary in such a way as to favour the instance. \textbf{REVISE}. The ones that cannot be learnt are just so because they are not linearly separable i.e. there exists no linear boundary that separates all instances of one class from all instances of the other. These are given below:
 \\\\
 \begin{tabular}{ l | c c c | l | c c c }
             & X1 & X2 & Label &         & X1 & X2 & Label \\

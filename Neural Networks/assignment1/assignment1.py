@@ -39,21 +39,27 @@ class Weights:
         return ''.join(['BIAS: ', str(self.bias), ', WEIGHTS: ',
                 str(self.weights)])
 
-def learn_perceptron(
-          training_instances
-        , wts = Weights(0.0, [0.0, 0.0])
+def grad_desc_sequential(training_instances, wts
         , learning_rate = 0.1
         , iteration_cap = 100
+        , collect_weights = False
         ):
     '''
     Learn a perceptron from the given training instances. If the default weights
     are used, then the given instances must be 2-dimensional. The algorithm used
     is sequential gradient descent.
+        If collect_weights is set, the weights will be recorded at each epoch
+    and returned in a list, rather than just returning the final weights.
     '''
+
+    if collect_weights:
+        weights_list = []
 
     converged = False
     iterations = 0
     while not converged and iterations < iteration_cap:
+
+        if collect_weights: weights_list.append(wts.copy())
 
         converged = True
         iterations = iterations + 1
@@ -66,11 +72,9 @@ def learn_perceptron(
                             learning_rate * inst.data[i] * inst.label)
                 wts.bias = wts.bias + (learning_rate * inst.label)
 
-    return (wts, iterations)
+    return (weights_list if collect_weights else wts, iterations)
 
-def learn_regressor(
-          training_instances
-        , wts = Weights(0.0, [0.0, 0.0])
+def grad_desc_batch(training_instances, wts
         , learning_rate = 0.1
         , iteration_cap = 100
         , convergence_threshold = 0.1
@@ -124,21 +128,25 @@ def heaviside_classify(wts, inst):
     '''
     return POSITIVE if activation(wts, inst) >= 0 else NEGATIVE
 
-def sigmoid_classify(wts, inst, coefficient=1, use_tanh=False):
+def sigmoid_classify(wts, inst, coefficient=1):
     '''
     Derive a value that represents both a class (+1 for values greater than 0,
     -1 for values less than 0) and a degree of certainty for our class decision.
     The more extreme the value, the more certain our decision is. The closer to
     0 the value is, the less certain we are.
-        This function will use the hyperbolic tangent function if the use_tanh
-    parameter is given as True (default is False). Otherwise, a sigmoidal
-    function S(t) = 1 / 1 - e^-ax, where a is the (optionally) given
-    coefficient, and x is the dot product of the given weight & instance
+        A sigmoidal function S(t) = 1 / 1 - e^-ax, where a is the (optionally)
+    given coefficient, and x is the dot product of the given weight & instance,
+    is used.
     '''
-    if use_tanh:
-        return np.tanh(activation(wts, inst))
-    else:
-        return 1 / (1 + (math.e ** (-1 * coefficient * activation(wts, inst))))
+    return 1 / (1 + (math.e ** (-1 * coefficient * activation(wts, inst))))
+
+def tanh_classify(wts, inst):
+    '''
+    This function uses the hyperbolic tangent function to obtain a degree of
+    certainty for classification, as with sigmoid_classify
+    '''
+    return np.tanh(activation(wts, inst))
+
 
 def activation(wts, inst):
     '''
@@ -177,12 +185,49 @@ def doPartA1():
         [ Instance([0, 0], NEGATIVE), Instance([1, 0], POSITIVE)
         , Instance([0, 1], POSITIVE), Instance([1, 1], NEGATIVE)
         ]]
+
+    print '--- SEQUENTIAL ---'
     for insts in instance_sets:
-        wts, iters = learn_perceptron(insts)
+        seq_wts, seq_iters = grad_desc_sequential(insts,
+                Weights(0.0, [0.0, 0.0]))
         for i in insts:
             print 'INST:', i.data, 'LABEL:', i.label, 'CLASS:', \
-                    str(heaviside_classify(wts, i))
-        print wts, '\n', 'ITERATIONS: ', iters, '\n'
+                    str(heaviside_classify(seq_wts, i))
+        print seq_wts, '\n', 'ITERATIONS: ', seq_iters, '\n'
+
+    print '--- BATCH ---'
+    for insts in instance_sets:
+        bat_wts, bat_iters = grad_desc_batch(insts, Weights(0.0, [0.0, 0.0]),
+                convergence_threshold=0.01)
+        for i in insts:
+            print 'INST:', i.data, 'LABEL:', i.label, 'CLASS:', \
+                    str(heaviside_classify(bat_wts, i))
+        print bat_wts, '\n', 'ITERATIONS: ', bat_iters, '\n'
+
+    # Illustrate procedure with instance_sets[4] using sequential by showing the
+    # graph after each iteration
+    wts_list, iters = grad_desc_sequential(instance_sets[4],
+            Weights(0.0, [0.0, 0.0]), collect_weights=True)
+    negX1vals = [i.data[0] for i in instance_sets[0] if i.label is NEGATIVE]
+    negX2vals = [i.data[1] for i in instance_sets[0] if i.label is NEGATIVE]
+    posX1vals = [i.data[0] for i in instance_sets[0] if i.label is POSITIVE]
+    posX2vals = [i.data[1] for i in instance_sets[0] if i.label is POSITIVE]
+    iter_num = 0
+    for wts in wts_list:
+        iter_num = iter_num + 1
+        print 'ITERATION', iter_num, 'OF', iters, ':', wts
+        # Generate two points on the decision boundary that we can use to draw
+        # the line
+        linex2s = [-0.2, 1.2]
+        linex1s = [-1 * (wts.bias + (x2 * wts.weights[1]))/(wts.weights[0] \
+                if wts.weights[0] != 0 else 0.000000001) for x2 in linex2s]
+
+        # Plot the points & line
+        plot.plot(posX1vals, posX2vals, 'r^', negX1vals, negX2vals, 'g^',
+                linex1s, linex2s, linewidth=1.0)
+        plot.ylim([-0.2, 1.2])
+        plot.xlim([-0.2, 1.2])
+        plot.show()
 
 def doPartA2():
     # Generate random data as specified:
@@ -196,7 +241,7 @@ def doPartA2():
         insts.append(Instance([negX1vals[i], negX2vals[i]], NEGATIVE))
 
     # Train the perceptron
-    wts, iterations = learn_perceptron(insts)
+    wts, iterations = grad_desc_batch(insts, Weights(0.0, [0.0, 0.0]))
 
     # Generate two points on the decision boundary that we can use to draw the
     # line
@@ -221,7 +266,7 @@ def doPartB1():
     data = [[x, (0.4 * x) + 3 + random.uniform(-10.0, 10.0)]
             for x in range(1, 200, 2)]
     insts = [Instance([d[0]], d[1]) for d in data]
-    wts, iters = learn_regressor(insts
+    wts, iters = grad_desc_batch(insts
             , wts=Weights(0.0, [0.0])
             , learning_rate = 0.00012
             , iteration_cap = 30000
@@ -243,7 +288,7 @@ def doPartB2():
             for x1 in range (1, 200, 20) for x2 in range(1, 200, 20)]
     insts = [Instance([d[0], d[1]], d[2]) for d in data]
 
-    wts, iters = learn_regressor(insts
+    wts, iters = grad_desc_batch(insts
             , wts=Weights(0.0, [0.0, 0.0])
             , learning_rate = 0.00000012
             , iteration_cap = 30000
@@ -266,7 +311,7 @@ def doPartB2():
     plot.show()
 
 if __name__ == "__main__":
-    #doPartA1()
+    doPartA1()
     #doPartA2()
     #doPartB1()
-    doPartB2()
+    #doPartB2()
