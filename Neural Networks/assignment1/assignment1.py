@@ -300,7 +300,7 @@ def doPartB2():
     # the plane nicely
     planeX1s = range(0, 200, 20)
     planeX2s = range(0, 200, 20)
-    planeX2s, planeX2s = np.meshgrid(planeX1s, planeX2s)
+    planeX1s, planeX2s = np.meshgrid(planeX1s, planeX2s)
     planeYs = [activation(wts, Instance([planeX1s[i], planeX2s[i]], None))
             for i in range(len(planeX1s))]
     fig = plot.figure()
@@ -311,7 +311,7 @@ def doPartB2():
     plot.show()
 
 if __name__ == "__main__":
-    doPartA1()
+    #doPartA1()
     #doPartA2()
     #doPartB1()
-    #doPartB2()
+    doPartB2()
