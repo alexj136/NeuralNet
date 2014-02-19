@@ -18,4 +18,17 @@ Answers to this question are given in WIDE list syntax.
     \item[\textbf{(d)}] \texttt{((nil.(nil.nil)).(nil.(nil.nil)))} \\
         This can also be interpreted as a list of numbers - it is the list \texttt{(2 0 0)}
 \end{enumerate}
+
+\section*{Question 2}
+The program:
+\begin{verbatim}
+    f(y) whererec f(y) = if y then cons nil f(tl y)
+                              else nil
+\end{verbatim}
+\indent computes the length of a list. Every binary tree can be thought of as encoding a list, and we can show this by giving an informal definition of lists:
+\begin{itemize}
+    \item \texttt{nil} encodes the empty list
+    \item \texttt{cons A B} encodes a list containing the element \texttt{A} concatenated with the list interpretation of \texttt{B}. Since \texttt{A} and \texttt{B} can be arbitrary trees, we can say that every binary tree encodes a list.
+\end{itemize}
+The given \texttt{F}-program builds a natural number encoding as it 'walks down' the spine of the given list. If the input is the empty list, \texttt{nil} i.e. \texttt{0} is returned. For all other inputs, which are of the form \texttt{cons A B}, the value returned is one plus the length of the list that B encodes.
 \end{document}
