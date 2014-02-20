@@ -10,18 +10,19 @@
 \begin{document}
 \maketitle
 
-\section*{Introduction}
-This report will detail the implementation of a single layer perceptron for the purposes of binary classification and linear regression. \\
+\begin{centering}
+\subsubsection*{Abstract}
+\end{centering}
+\noindent This report will detail the implementation of a single layer perceptron for the purposes of binary classification and linear regression. \\
 \indent The perceptron was implemented in Python. No Neural Network libraries or toolkits were used. Matplotlib and Numpy were used to produce graphs.
+\vspace{4mm}
 
 \section*{Part A: Classification}
-\subsection*{Question 1}
-Sequential gradient descent was used, as it is somewhat simpler to implement, and for such a simple case, there is no benefit in terms of what we want to demonstrate, to using a more complicated implementation. Batch gradient descent will be used in the latter questions of this assignment, however. \\
-\indent The Perceptron Criterion error function is used in this task, because unlike more naive error functions, Perceptron Criterion function yields a value proportional to the (sum of the) distance from the decision boundary. This is useful because any change in weights will correspond to a change in the value that the error function yields, which allows us to calculate the gradient of the error function, which in turn allows us to learn the optimum decision boundary via gradient descent. If a change in weights does not correspond to a change in error, we cannot determine whether the weight adjustment improved or worsened our learned function. \\
-\indent The choice of learning rate for this task is not terribly important - it should be large enough that it does not cause the algorithm to do unnecessary extra iterations, and not be so great as to prevent convergence. 0.1 was found to be sufficient. \\
-\indent Initial weights were all zero as specified in the assignment brief. \\
-
 \subsubsection*{Training Procedure}
+In this part, sequential gradient descent was used, as it is somewhat simpler to implement, and for such simple cases, there is no benefit in terms of what we want to demonstrate, to using a more complicated implementation. Batch gradient descent will be used in part 2 of this assignment, however. \\
+\indent The Perceptron Criterion error function is used, because unlike more naive error functions, Perceptron Criterion function yields a value proportional to the (sum of the) distance from the decision boundary. This is useful because any change in weights will correspond to a change in the value that the error function yields, which allows us to calculate the gradient of the error function, which in turn allows us to learn the optimum decision boundary via gradient descent. If a change in weights does not correspond to a change in error, we cannot determine whether the weight adjustment improved or worsened our learned function. \\
+\indent The choice of learning rate for this part is not terribly important - it should be large enough that it does not cause the algorithm to do unnecessary extra iterations, and not be so great as to prevent convergence. 0.1 was found to be sufficient. \\
+
 The training procedure for sequential gradient descent is as follows: \\
 
 \begin{algorithm}[H]{\textbf{Procedure}: GradientDescentSequential} \\
@@ -44,6 +45,9 @@ The training procedure for sequential gradient descent is as follows: \\
 \[E^{Perc} = -\sum_{i = 1}^{m} \underline{x}_{i} . \underline{y}_{i} t_{i} \hspace{2mm} \textrm{for all misclassified} \hspace{2mm} x_{i}\]
 With batch gradient descent, we can simply update every weight by the amount returned by this error function, multiplied by the learning rate. However, when applying this error function to sequential gradient descent, we get the following update rule:
 \[w_{t+1} = w_{t} + \eta \underline{x}_{i} t_{i}\]
+which is applied once for each instance over each epoch.
+\subsection*{Question 1}
+\indent For this question, initial weights were all zero as specified in the assignment brief.
 
 \subsubsection*{Learnable Patterns}
 The implemented single layer perceptron was able to learn four of the six given patterns:
@@ -100,7 +104,42 @@ The graphs below show the state of the decision boundary after each iteration, f
 \centerline{\includegraphics[width=200px]{partA1_iter3}}
 
 \subsection*{Question 2}
+In this question, the same code was used to learn the decision boundary as with question 1. The graph below shows the output of an example run of the implementation for this question: \\\\
+\centerline{\textbf{Example Instances \& Decision Boundary}}
+\centerline{\includegraphics[width=400px]{partA2_1}}
 
+\noindent The graph below shows the boundary learned for a non-linearly separable set of points - the decision boundary is not able to classify all points correctly, and, moreover, it is far from optimal, as we can see from the graph. It does not describe the data well. Since the algorithm used does not terminate for non-linearly separable data (it will never be the case that all points are correctly classified), an iteration limit must be imposed for non-linearly separable data. In the example below, the algorithm was limited to 100 iterations (over all data points i.e. 100 epochs). \\\\
+\centerline{\textbf{Example of non-linearly separable Instances \& resulting Decision Boundary}}
+\centerline{\includegraphics[width=400px]{partA2_2}}
+\vspace{6mm}
+
+\noindent The graphs below show how the decision boundary moves after each iteration for a set of points that were learned in 3 iterations: \\
+\begin{center}
+\textbf{Initial State}: Bias = 0, W1 = 0, W2 = 0 \\
+\centerline{\includegraphics[width=400px, height=220px]{partA2_iter0}}
+\vspace{2mm}
+\rule{8cm}{0.4pt} \\
+\vspace{2mm}
+\textbf{After First Iteration}: Bias = 0.3, W1 = -0.22, W2 = 0.04 \\
+\centerline{\includegraphics[width=400px, height=220px]{partA2_iter1}}
+\vspace{2mm}
+\rule{8cm}{0.4pt} \\
+\vspace{2mm}
+\textbf{After Second Iteration}: Bias = 0.4, W1 = -0.43, W2 = -0.05 \\
+\centerline{\includegraphics[width=400px, height=220px]{partA2_iter2}}
+\vspace{2mm}
+\rule{8cm}{0.4pt} \\
+\vspace{2mm}
+\textbf{After Third Iteration} (final state): Bias = 0.5, W1 = -0.33, W2 = -0.04 \\
+\centerline{\includegraphics[width=400px, height=220px]{partA2_iter3}}
+\vspace{2mm}
+\rule{8cm}{0.4pt} \\
+\vspace{2mm}
+\end{center}
+
+\noindent Given the function used to generate the data, the ideal decision boundary would be the vertical line X1 = 2. In all cases we have seen, the noise in the data prevents such a line from being learned. With a larger dataset, this noise would likely not affect the line to such a degree, however the larger the dataset becomes, the less likely it is that the dataset is linearly separable.
+
+\textbf{TODO tanh activation function}
 \section*{Part B: Regression}
 \subsection*{Question 1}
 

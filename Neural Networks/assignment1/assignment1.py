@@ -243,7 +243,7 @@ def doPartA2():
         insts.append(Instance([negX1vals[i], negX2vals[i]], NEGATIVE))
 
     # Train the perceptron
-    wts, iterations = grad_desc_batch(insts, Weights(0.0, [0.0, 0.0]))
+    wts, iterations = grad_desc_sequential(insts, Weights(0.0, [0.0, 0.0]))
 
     # Generate two points on the decision boundary that we can use to draw the
     # line
@@ -256,7 +256,30 @@ def doPartA2():
     # Plot the points & line
     plot.plot(posX1vals, posX2vals, 'r^', negX1vals, negX2vals, 'g^',
             linex1s, linex2s, linewidth=1.0)
+    plot.xlabel('X1')
+    plot.ylabel('X2')
     plot.show()
+
+    # Illustrate procedure with instance_sets[4] using sequential by showing the
+    # graph after each iteration
+    wts_list, iters = grad_desc_sequential(insts,
+            Weights(0.0, [0.0, 0.0]), collect_weights=True)
+    iter_num = 0
+    for wts in wts_list:
+        iter_num = iter_num + 1
+        print 'ITERATION', iter_num, 'OF', iters, ':', wts
+        # Generate two points on the decision boundary that we can use to draw
+        # the line
+        linex2s = [3.0, -3.0]
+        linex1s = [-1 * (wts.bias + (x2 * wts.weights[1]))/(wts.weights[0]
+                if wts.weights[0] != 0 else 0.000000001) for x2 in linex2s]
+
+        # Plot the points & line
+        plot.plot(posX1vals, posX2vals, 'r^', negX1vals, negX2vals, 'g^',
+                linex1s, linex2s, linewidth=1.0)
+        plot.xlabel('X1')
+        plot.ylabel('X2')
+        plot.show()
 
 def doPartB1():
     '''
@@ -313,7 +336,7 @@ def doPartB2():
     plot.show()
 
 if __name__ == "__main__":
-    doPartA1()
-    #doPartA2()
+    #doPartA1()
+    doPartA2()
     #doPartB1()
     #doPartB2()
