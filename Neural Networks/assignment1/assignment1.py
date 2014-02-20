@@ -259,7 +259,7 @@ def doPartA2():
     plot.xlabel('X1')
     plot.ylabel('X2')
     plot.show()
-
+    """
     # Illustrate procedure with instance_sets[4] using sequential by showing the
     # graph after each iteration
     wts_list, iters = grad_desc_sequential(insts,
@@ -281,6 +281,7 @@ def doPartA2():
         plot.xlabel('X1')
         plot.ylabel('X2')
         plot.show()
+    """
 
 def doPartB1():
     '''
@@ -311,7 +312,7 @@ def doPartB1():
 
 def doPartB2():
     # y = 0.4*x1 + 1.4*x2 + delta, delta = uniform random from -100 to +100
-    data = [[x1, x2, (0.4 * x1) + (1.4 * x2) + random.uniform(-100.0, 100.0)]
+    data = [[x1, x2, (0.4 * x1) + (1.4 * x2) + random.uniform(-100, 100)]
             for x1 in range (1, 200, 20) for x2 in range(1, 200, 20)]
     insts = [Instance([d[0], d[1]], d[2]) for d in data]
 
@@ -340,8 +341,11 @@ def doPartB2():
     axis.set_zlabel('Label')
     plot.show()
 
+    print 'av bias', str(np.mean([w.bias for w in ws])), 'av w1', str(np.mean([w.weights[0] for w in ws])), 'av w2', str(np.mean([w.weights[1] for w in ws])), 'av iters', str(np.mean(iss))
+
 if __name__ == "__main__":
+    # Uncomment as required
     #doPartA1()
-    #doPartA2()
+    doPartA2()
     #doPartB1()
-    doPartB2()
+    #doPartB2()
