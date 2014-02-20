@@ -141,8 +141,115 @@ In this question, the same code was used to learn the decision boundary as with 
 
 \textbf{TODO tanh activation function}
 \section*{Part B: Regression}
+For this part, batch gradient descent is used - this is because it makes it easier to determine when the algorithm should conclude. Determining when the algorithm should conclude is very simple with a classification task - we can simply stop iterating when all points are correctly classified. With regression, however, this will never be the case, since labels are continuous. Instead, we use a \emph{convergence threshold} - this is a value, which is determined before execution, that determines when the algorithm concludes. If an iteration takes place, and none of the weights change by an amount greater in magnitude than our convergence threshold, we consider the algorithm to have converged. \\
+\indent The Perceptron Criterion error function is also used in this implementation, for the same reasons as with part A.
+A much lower learning rate is required due to the nature of the training procedure - The large feature values for our instances cause divergence (i.e. the algorithm never converges and the weights go off to infinity) if we do not use a very small learning rate to compensate. \\
+\indent The training procedure for this part of the assignment is given below:
+
+\begin{algorithm}[H]{\textbf{Procedure}: GradientDescentBatch} \\
+    \KwIn{trainingData, weights, learningRate}
+    \SetAlgoLined
+    \Begin{
+        \While{algorithm not converged}{
+            Calculate the average error across all trainingData, and adjust the weights appropriately, in proportion to learningRate
+        }
+    }
+    \KwResult{weights}
+\end{algorithm}
+\vspace{4mm}
 \subsection*{Question 1}
 
+The tables below show weights learned by the network for different sets of points, each generated as specified, with 3 different ranges for random fluctuation. Interestingly, we can see that with small random fluctuations, we are able to learn a gradient that is relatively very close to the original function, but the learned bias deviates from the original function by a much greater degree. As the size of the random fluctuation increases, we can see that on average, the bias learned is much closer to the bias in the original function (although it fluctuates to a greater degree). The learned gradient becomes further from the actual function as the size of the random fluctuations increase.
+
+\begin{center}
+    \textbf{Fluctuations: -10 to +10}        \\
+    \begin{tabular}{ r | l | l | l }
+        \hline
+        & Bias (3SF) & W1 (3SF) & Iterations \\
+        \hline
+        & 2.51       & 0.401    & 27368      \\
+        & 0.141      & 0.408    & 2252       \\
+        & 0.00388    & 0.422    & 20         \\
+        & 0.897      & 0.416    & 12491      \\
+        & 2.14       & 0.402    & 24536      \\
+        & 1.78       & 0.406    & 21486      \\
+        & 0.556      & 0.427    & 8258       \\
+        & 2.48       & 0.406    & 27178      \\
+        & 0.661      & 0.417    & 9623       \\
+        & 2.28       & 0.399    & 25610      \\
+        \hline
+   Avg: & 1.34       & 0.410    & 15882.2    \\
+        \hline
+    \end{tabular}
+\end{center}
+\vspace{5mm}
+\begin{center}
+    \textbf{Fluctuations: -30 to +30}        \\
+    \begin{tabular}{ r | l | l | l }
+        \hline
+        & Bias (3SF) & W1 (3SF) & Iterations \\
+        \hline
+        & 3.41       & 0.363    & 29741      \\
+        & 0.795      & 0.414    & 11289      \\
+        & 0.00367    & 0.438    & 20         \\
+        & 1.62       & 0.394    & 19988      \\
+        & 5.60       & 0.403    & 30259      \\
+        & 0.00306    & 0.413    & 20         \\
+        & 0.00320    & 0.415    & 20         \\
+        & 2.79       & 0.425    & 29439      \\
+        & 1.63       & 0.410    & 20108      \\
+        & 0.603      & 0.423    & 8879       \\
+        \hline
+   Avg: & 1.65       & 0.410    & 14976.3    \\
+        \hline
+    \end{tabular}
+\end{center}
+\vspace{5mm}
+\begin{center}
+    \textbf{Fluctuations: -50 to +50}        \\
+    \begin{tabular}{ r | l | l | l }
+        \hline
+        & Bias (3SF) & W1 (3SF) & Iterations \\
+        \hline
+        & 11.4       & 0.356    & 63914      \\
+        & 0.00390    & 0.427    & 20         \\
+        & -2.93      & 0.471    & 30432      \\
+        & -0.297     & 0.445    & 4733       \\
+        & -2.17      & 0.460    & 24792      \\
+        & 7.90       & 0.382    & 53755      \\
+        & 1.13       & 0.382    & 15103      \\
+        & 0.0235     & 0.43     & 342        \\
+        & 9.42       & 0.330    & 58534      \\
+        & 4.41       & 0.367    & 39177      \\
+        \hline
+   Avg: & 2.89       & 0.405    & 29080.2    \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\noindent The convergence threshold used was 0.000059, which was chosen because it is small enough that we do not conclude early because of our low learning rate - since our learning rate has to be very small for the algorithm to converge, the weights change by very small amounts each iteration. We need a convergence threshold that allows the weights to change very slowly without 'cutting short' the iteration because changes in the weights are very small. \\
+\indent The learning rate used was 0.00000012, which is small enough that the algorithm will converge and not diverge, but not so small as to necessitate many additional iterations such that the algorithm concludes in an unreasonably long amount of time.
+\indent The graph below shows some example output with fluctuations of -10 to +10.
+\begin{center}
+\textbf{Example output for part B1}\\
+\centerline{\includegraphics[width=400px, height=220px]{partB1}}
+\vspace{2mm}
+\end{center}
+
 \subsection*{Question 2}
+For this task, again, the learning rate and convergence threshold had to be very small to allow convergence without causing early termination. The used learning rate was 0.00000012 and the convergence threshold was 0.00003. \\
+\indent Since two feature values are used, we can plot the values as points in 3D space, and the learned regressor is a plane in this 3D space. The graphs below show an example output plane of regression, for the same set of points \& weights, viewed from different angles.
+
+\begin{center}
+\textbf{Bias: 0.00478, W1: 0.397, W2: 1.35 (3SF)}\\
+\centerline{\includegraphics[width=400px, height=400px]{partB2_1}}
+\vspace{2mm}
+\centerline{\includegraphics[width=400px, height=400px]{partB2_2}}
+\vspace{2mm}
+\centerline{\includegraphics[width=400px, height=400px]{partB2_3}}
+\vspace{2mm}
+\end{center}
+
+\noindent We can see from the values above, that the network produces weight values that are relatively even closer to those used in the original function, compared with those in part B1.
 
 \end{document}

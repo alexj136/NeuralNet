@@ -269,7 +269,8 @@ def doPartA2():
         iter_num = iter_num + 1
         print 'ITERATION', iter_num, 'OF', iters, ':', wts
         # Generate two points on the decision boundary that we can use to draw
-        # the line
+        # the line. Prevent division by zero by substituting zero values with a
+        # very small number, that produces the same line.
         linex2s = [3.0, -3.0]
         linex1s = [-1 * (wts.bias + (x2 * wts.weights[1]))/(wts.weights[0]
                 if wts.weights[0] != 0 else 0.000000001) for x2 in linex2s]
@@ -286,7 +287,6 @@ def doPartB1():
     For this regression task, we think of our data as 1-dimensional, and the
     second dimension is essentially our class label.
     '''
-
     # y = 0.4*x + 3 + delta, delta = uniform random from -10 to +10
     data = [[x, (0.4 * x) + 3 + random.uniform(-10.0, 10.0)]
             for x in range(1, 200, 2)]
@@ -294,8 +294,8 @@ def doPartB1():
     wts, iters = grad_desc_batch(insts
             , wts=Weights(0.0, [0.0])
             , learning_rate = 0.00012
-            , iteration_cap = 30000
-            , convergence_threshold = 0.000003
+            , iteration_cap = 70000
+            , convergence_threshold = 0.000059
             )
     print wts, ', ITERS:', iters
 
@@ -305,6 +305,8 @@ def doPartB1():
     linex2s = [activation(wts, Instance([x1], None)) for x1 in linex1s]
     plot.plot([d[0] for d in data], [d[1] for d in data], 'b^',
             linex1s, linex2s, linewidth=1.0)
+    plot.xlabel('X')
+    plot.ylabel('Label')
     plot.show()
 
 def doPartB2():
@@ -333,10 +335,13 @@ def doPartB2():
     axis.scatter([i.data[0] for i in insts], [i.data[1] for i in insts],
             [i.label for i in insts])
     axis.plot_wireframe(planeX1s, planeX2s, planeYs)
+    axis.set_xlabel('X1')
+    axis.set_ylabel('X2')
+    axis.set_zlabel('Label')
     plot.show()
 
 if __name__ == "__main__":
     #doPartA1()
-    doPartA2()
+    #doPartA2()
     #doPartB1()
-    #doPartB2()
+    doPartB2()
