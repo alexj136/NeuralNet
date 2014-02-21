@@ -347,6 +347,6 @@ def doPartB2():
 if __name__ == "__main__":
     # Uncomment as required
     #doPartA1()
-    doPartA2()
+    #doPartA2()
     #doPartB1()
-    #doPartB2()
+    doPartB2()

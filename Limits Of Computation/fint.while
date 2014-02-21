@@ -1,0 +1,10 @@
+read PD
+	(* Start by splitting our input into the program & the argument *)
+	P := hd PD;
+	D := tl PD;
+	
+	(* The program is further divided into an expression Exp that gets evaluated, and a function definition B *)
+	Bdy := tl P; (* The function body B that we pass throught the semantics *)
+	Exp := hd P (* The expression which we must evaluate *)
+	
+write D
