@@ -1,10 +1,10 @@
 read PD
-	(* Start by splitting our input into the program & the argument *)
-	P := hd PD;
-	D := tl PD;
+	P := hd PD (* Start by splitting our input into the program & the argument *)
+	D := tl PD
 	
-	(* The program is further divided into an expression Exp that gets evaluated, and a function definition B *)
-	Bdy := tl P; (* The function body B that we pass throught the semantics *)
-	Exp := hd P (* The expression which we must evaluate *)
-	
+	Bdy := tl P; (* The program is further divided into an expression Exp that gets evaluated, and a function definition B *)(* The function body B that we pass throught the semantics *)
+	Exp := hd P; (* The expression which we must evaluate *)
+
+	Vl := cons D nil; (* Stack that stores the variable value for each function call - initially contains the argument *)
+	St := nil; (* Stack used when evaluating expressions - initially empty *)
 write D
