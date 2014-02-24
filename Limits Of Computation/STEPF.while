@@ -1,8 +1,7 @@
 read state
-    do_hd := "11";
-	case state of 
-		(((quote D).Cr) St) => new_state := (list Cr                       (cons D St));
-		(((var).Cr)     St) => new_state := (list Cr                       (cons Vl St));
-		(((hd E).Cr     St) => new_state := (list (cons E (cons do_hd Cr)) St)
-		any => Res := nil
+	case state of
+		(((quote D).Cr) St VL) => new_state := (list Cr (cons D St));
+		(((var).Cr) St) => new_state := (list Cr (cons Vl St));
+		(((hd E).Cr St) => new_state := (list (cons E (cons do_hd Cr)) St);
+		(any) => new_state := nil
 write state

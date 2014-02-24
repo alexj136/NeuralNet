@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 
 \title{Limits Of Computation: Assignment 1}
 \author{Candidate Number: 18512}
@@ -38,7 +39,21 @@ The \texttt{F}-program \textbf{\texttt{diverge}} is given below:
 \begin{verbatim}
     f(y) whererec f(y) = f(y)
 \end{verbatim}
-\textbf{INCOMPLETE}
+We can see that this program will not terminate from the semantics of \texttt{F}. For function application, we have the rule:
+\begin{equation*}
+    \mathcal{F} [\![ \texttt{f(}E\texttt{)} ]\!] B \hspace{1mm} \texttt{d} = \begin{cases}
+        \mathcal{F} [\![ B ]\!] B \hspace{1mm} \texttt{d} \hspace{3mm} \text{if} \hspace{3mm} \mathcal{F} [\![ E ]\!] B \hspace{1mm} v = \texttt{d} \in \mathbb{D} \\
+        \bot \hspace{1mm} \text{otherwise}
+    \end{cases}
+\end{equation*}
+In the case of \textbf{\texttt{diverge}}, we have:
+\begin{equation*}
+    \mathcal{F} [\![ \texttt{f(y)} ]\!] \texttt{f(y)} \hspace{1mm} \texttt{y} = \begin{cases}
+        \mathcal{F} [\![ \texttt{f(y)} ]\!] \texttt{f(y)} \hspace{1mm} \texttt{y} \hspace{3mm} \text{if} \hspace{3mm} \mathcal{F} [\![ \texttt{f(y)} ]\!] \texttt{f(y)} \hspace{1mm} \texttt{y} = \texttt{d} \in \mathbb{D} \\
+        \bot \hspace{1mm} \text{otherwise}
+    \end{cases}
+\end{equation*}
+Which means that \texttt{f(y)} is defined recursively with no base case, giving infinite recursion during execution. We can therefore say that $[\![\texttt{diverge}]\!]^{\texttt{f}} \hspace{1mm} \texttt{nil} = \bot$, and indeed $[\![\texttt{diverge}]\!]^{\texttt{f}} \hspace{1mm} \texttt{d} = \bot$ for all $\texttt{d} \in \mathbb{D}$.
 
 \section*{Question 4}
 The semantics of \texttt{if-then-else} in \texttt{F} are shown below:
@@ -66,8 +81,8 @@ Note that the outermost pair of brackets do not represent a list - they show tha
 
 \section*{Question 6}
 \begin{enumerate}
-    \item[\textbf{(a)}] \texttt{WHILE}-programs are a good choice for a notion of effective computability because \texttt{WHILE} has a good balance of expressivity and simplicity. Expressivity is valuable when dealing with complex algorithms, such as those that handle programs as data objects, like compilers, interpreters and specialisers. Simplicity is valuable when proving properties of programs, which is something you would expect to do with a formalism for effective computability.
-    \item[\textbf{(b)}] \texttt{F}-programs\dots
+    \item[\textbf{(a)}] \texttt{WHILE}-programs are a good choice for a notion of effective computability because \texttt{WHILE} has a good balance of expressivity and simplicity. Expressivity is valuable when dealing with complex algorithms, such as those that handle programs as data objects, like compilers, interpreters and specialisers. Simplicity is valuable when proving properties of programs, which is something you would expect to do with such a formalism.
+    \item[\textbf{(b)}] \texttt{F}-programs are also a good choice for a notion of effective computability. \texttt{F}-data is equivalent to \texttt{WHILE}-data, which provides an efficient way to encode programs as data objects, and other data types such as natural numbers, lists, etcetera. Recursion with conditionals gives us the same expressive power as while-loops with assignments - we can \dots
 \end{enumerate}
 
 \textbf{INCOMPLETE}
