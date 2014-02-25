@@ -53,7 +53,7 @@ In the case of \textbf{\texttt{diverge}}, we have:
         \bot \hspace{1mm} \text{otherwise}
     \end{cases}
 \end{equation*}
-Which means that \texttt{f(y)} is defined recursively with no base case, giving infinite recursion during execution. We can therefore say that $[\![\texttt{diverge}]\!]^{\texttt{f}} \hspace{1mm} \texttt{nil} = \bot$, and indeed $[\![\texttt{diverge}]\!]^{\texttt{f}} \hspace{1mm} \texttt{d} = \bot$ for all $\texttt{d} \in \mathbb{D}$.
+Which means that \texttt{f(y)} is defined recursively with no base case, giving infinite recursion during execution. We can therefore say that $[\![\texttt{diverge}]\!]^{\texttt{F}} \hspace{1mm} \texttt{nil} = \bot$, and indeed $[\![\texttt{diverge}]\!]^{\texttt{F}} \hspace{1mm} \texttt{d} = \bot$ for all $\texttt{d} \in \mathbb{D}$.
 
 \section*{Question 4}
 The semantics of \texttt{if-then-else} in \texttt{F} are shown below:
@@ -80,13 +80,33 @@ The data representation of the \texttt{F}-program \textbf{\texttt{limits}} is gi
 Note that the outermost pair of brackets do not represent a list - they show that the stuff before the dot is constructed together with the stuff after it.
 
 \section*{Question 6}
-\begin{enumerate}
-    \item[\textbf{(a)}] \texttt{WHILE}-programs are a good choice for a notion of effective computability because \texttt{WHILE} has a good balance of expressivity and simplicity. Expressivity is valuable when dealing with complex algorithms, such as those that handle programs as data objects, like compilers, interpreters and specialisers. Simplicity is valuable when proving properties of programs, which is something you would expect to do with such a formalism.
-    \item[\textbf{(b)}] \texttt{F}-programs are also a good choice for a notion of effective computability. \texttt{F}-data is equivalent to \texttt{WHILE}-data, which provides an efficient way to encode programs as data objects, and other data types such as natural numbers, lists, etcetera. Recursion with conditionals gives us the same expressive power as while-loops with assignments. We can represent the variable store with the arguments to each function call. The repetition that a while loop gives us is achieved by making recursive calls, and we can use conditionals to prevent recursion ad infinitum.
-\end{enumerate}
-
-\textbf{INCOMPLETE}
+\paragraph*{(A)}
+\texttt{WHILE}-programs are a good choice for a notion of effective computability because \texttt{WHILE} has a good balance of expressivity and simplicity. Expressivity is valuable when dealing with complex algorithms, such as those that handle programs as data objects, like compilers, interpreters and specialisers. Simplicity is valuable when proving properties of programs, which is something you would expect to do with such a formalism.
+\paragraph*{(B)}
+\texttt{F}-programs are also a good choice for a notion of effective computability. \texttt{F}-data is equivalent to \texttt{WHILE}-data, which provides an efficient way to encode programs as data objects, and other data types such as natural numbers, lists, etcetera. Recursion with conditionals gives us the same expressive power as while-loops with assignments. We can represent the variable store with the arguments to each function call. The repetition that a while loop gives us is achieved by making recursive calls, and we can use conditionals to prevent recursion ad infinitum. We could prove that \texttt{F}-programs are equivalent to \texttt{WHILE}-programs by giving an interpreter for \texttt{WHILE} in \texttt{F}.\\
+\indent One drawback to using \texttt{F}-programs as a notion for effective procedures is the lack of intermediate variable declarations. This makes it very laborious to write complex programs such as interpreters, as encoded programs cannot be subdivided into separate parts for analysis without making a recursive call.
 
 \section*{Question 7}
-\texttt{Vl} stores the values of variable, which is the argument to the current function call.
+The rewrite rule:
+\begin{verbatim}
+    [((appf E).Cr), St] => [cons* E doAppf Cr, St]
+\end{verbatim}
+begins the execution of a function call. We take the argument to the function call \texttt{E}, and the \texttt{doAppf} atom and push them on the code stack \texttt{Cd}, so that the argument is on top of the stack, with the \texttt{doAppf} atom immediately below it. Arranging the code stack in this manner indicates that the argument expression should next be evaluated, and once it is evaluated, the \texttt{doAppf} atom indicates that the argument evaluation is complete and the function call can take place.\\
+\indent The rewrite rule:
+\begin{verbatim}
+    [(doAppf.Cr), (W.Sr)] => { Cd := cons* B return Cr;
+                               St := cons Vl Sr;
+                               Vl := W }
+\end{verbatim}
+handles entry to a new function call once the function argument has been evaluated. The \texttt{doAppf} atom is found on the top of the code stack, indicating that a function argument has just been evaluated and a function call should now be made with that argument, which will be on top of the computation stack \texttt{St}. This is the pattern variable \texttt{W}. To initiate the function evaluation, we push \texttt{B} and the \texttt{return} atom on the code stack, such that \texttt{B} is on top of the stack with the \texttt{return} atom underneath it. This will cause the body of the function \texttt{B} to be evaluated, and once its evaluation is complete, the \texttt{return} atom indicates this so that the function can return. The value of the variable on the caller's side \texttt{Vl} is pushed onto the computation stack so that it can be restored once the callee's execution concludes. The argument \texttt{W} is to become the variable value on the callee side, so \texttt{Vl} is updated with the value of \texttt{W}. Execution of the callee function can now begin.\\
+\indent The rewrite rule:
+\begin{verbatim}
+    [(return.Cr), (U.(V.Sr))] => { Cd := Cr;
+                                   St := cons U Sr;
+                                   Vl := V }
+\end{verbatim}
+handles the exit from a complete function. The return value \texttt{U} is on top of the computation stack, and underneath it is the variable value for the function that called the function now being returned from, \texttt{V}. The first command: \texttt{Cd := Cr;} serves the purpose of discarding the \texttt{return} token from the code stack, as the \texttt{return} atom has now served its purpose in indicating that the function call is complete. The next two commands have the combined effect of removing the variable value for the previous function call \texttt{V} from the computation stack and restoring it as the current active variable (by assigning it to \texttt{Vl}), whilst leaving the expression returned from the function call on top of the computation stack, for the caller to subsequently use.
+
+\section*{Question 8}
+Please see the files \texttt{fint.while} and \texttt{STEPF.while}.
 \end{document}

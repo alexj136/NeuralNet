@@ -1,3 +1,4 @@
+// Candidate No: 18512
 read X // X is ((E.B).D) where D is the program argument, E is the expression before the whererec, and B is the body of the function after whererec
 	Cd := cons hd hd X nil; // Stack of code to evaluate (one per function call). Initially contains only the expression before the whererec
 	B := tl hd X; // Body of  function definition - carried through all the semantic definitions
