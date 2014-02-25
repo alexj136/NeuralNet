@@ -9,11 +9,10 @@ read CdStVlB
 	do_hd := "11";
 	do_tl := "12";
 	do_cons := "13";
-	cond := "14";
-	do_cond := "15";
-	appf := "16";
-	do_appf := "17";
-	return := "18";
+	do_if := "14";
+	// appf := semicolon
+	do_appf := "15";
+	return := "16";
 	
 	case CdSt of
 		(((quote D).Cr) St) => new_CdSt := (list Cr cons D St);
@@ -31,23 +30,23 @@ read CdStVlB
 		(((cons E1 E2).Cr) St) => new_CdSt := (list cons E1 cons E2 cons do_cons Cr St);
 		((13.Cr) (U.(T.Sr))) => new_CdSt := (list Cr cons cons T U Sr);
 
-		// appf = 16, do_appf = 17
-		(((16 E).Cr) St) => new_CdSt := (list cons E cons do_appf Cr St);
-		((17.Cr) (W.Sr)) => Cd := cons B cons return Cr;
+		// appf = semicolon, do_appf = 15
+		(((; E).Cr) St) => new_CdSt := (list cons E cons do_appf Cr St);
+		((15.Cr) (W.Sr)) => Cd := cons B cons return Cr;
 							St := cons Vl Sr;
 							Vl := W;
 							new_CdSt := (list Cd St);
 
-		// return = 18
-		((18.Cr) (U.(V.Sr))) => Cd := Cr;
+		// return = 16
+		((16.Cr) (U.(V.Sr))) => Cd := Cr;
 								St := cons U Sr;
 								Vl := V;
 								new_CdSt := (list Cd St);
 
-		// cond = 14, do_cond = 15
-		(((14 E F G).Cr) St) => new_CdSt := (list cons E cons do_cond cons F cons G Cr St);
-		((do_cond.(F.(G.Cr))) (nil.Sr)) => new_CdSt := (list cons G Cr Sr);
-		((do_cond.(F.(G.Cr))) (D.Sr)) => new_CdSt := (list cons F Cr Sr);
+		// do_if = 14
+		(((if E F G).Cr) St) => new_CdSt := (list cons E cons do_if cons F cons G Cr St);
+		((14.(F.(G.Cr))) (nil.Sr)) => new_CdSt := (list cons G Cr Sr);
+		((14.(F.(G.Cr))) (D.Sr)) => new_CdSt := (list cons F Cr Sr);
 
 	// Build up a list of the same form as the argument
 	new_CdStVl := (list hd new_CdSt hd tl new_CdSt Vl)
