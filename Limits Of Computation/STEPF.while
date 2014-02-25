@@ -6,11 +6,26 @@ read CdStVl
 	
 	// Some auxilliary constants for readability
 	do_hd := "11";
+	do_tl := "12";
+	do_cons := "13";
+	cond := "14";
+	do_cond := "15";
+	appf := "16";
+	do_appf := "17";
+	return := "18";
 	
 	case CdSt of
 		(((quote D).Cr) St) => new_CdSt := (list Cr cons D St);
 		(((var).Cr) St) => new_CdSt := (list Cr cons Vl St);
+
+		// hd and do_hd (11 = do_hd)
 		(((hd E).Cr) St) => new_CdSt := (list cons E cons do_hd Cr St);
+		((11.Cr) (T.Sr)) => new_CdSt := (list Cr cons hd T Sr);
+
+		// tl and do_tl (11 = do_tl)
+		(((tl E).Cr) St) => new_CdSt := (list cons E cons do_tl Cr St);
+		((12.Cr) (T.Sr)) => new_CdSt := (list Cr cons tl T Sr);
+		
 
 	// Build up a list of the same form as the argument
 	new_CdStVl := (list hd new_CdSt hd tl new_CdSt Vl)
