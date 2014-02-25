@@ -1,7 +1,17 @@
-read state
-	case state of
-		(((quote D).Cr) St VL) => new_state := (list Cr (cons D St));
-		(((var).Cr) St) => new_state := (list Cr (cons Vl St));
-		(((hd E).Cr St) => new_state := (list (cons E (cons do_hd Cr)) St);
-		(any) => new_state := nil
-write state
+read CdStVl
+	// Break the list up into separate parts - the command stack & computation stack in one list for
+	// pattern matching, and Vl as a variable on its own
+	CdSt := (list hd CdStVl hd tl CdStVl);
+	Vl := tl tl CdStVl;
+	
+	// Some auxilliary constants for readability
+	do_hd := "11";
+	
+	case CdSt of
+		(((quote D).Cr) St) => new_CdSt := (list Cr cons D St);
+		(((var).Cr) St) => new_CdSt := (list Cr cons Vl St);
+		(((hd E).Cr) St) => new_CdSt := (list cons E cons do_hd Cr St);
+
+	// Build up a list of the same form as the argument
+	new_CdStVl := (list hd new_CdSt hd tl new_CdSt Vl)
+write new_CdStVl

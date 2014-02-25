@@ -82,11 +82,11 @@ Note that the outermost pair of brackets do not represent a list - they show tha
 \section*{Question 6}
 \begin{enumerate}
     \item[\textbf{(a)}] \texttt{WHILE}-programs are a good choice for a notion of effective computability because \texttt{WHILE} has a good balance of expressivity and simplicity. Expressivity is valuable when dealing with complex algorithms, such as those that handle programs as data objects, like compilers, interpreters and specialisers. Simplicity is valuable when proving properties of programs, which is something you would expect to do with such a formalism.
-    \item[\textbf{(b)}] \texttt{F}-programs are also a good choice for a notion of effective computability. \texttt{F}-data is equivalent to \texttt{WHILE}-data, which provides an efficient way to encode programs as data objects, and other data types such as natural numbers, lists, etcetera. Recursion with conditionals gives us the same expressive power as while-loops with assignments - we can \dots
+    \item[\textbf{(b)}] \texttt{F}-programs are also a good choice for a notion of effective computability. \texttt{F}-data is equivalent to \texttt{WHILE}-data, which provides an efficient way to encode programs as data objects, and other data types such as natural numbers, lists, etcetera. Recursion with conditionals gives us the same expressive power as while-loops with assignments. We can represent the variable store with the arguments to each function call. The repetition that a while loop gives us is achieved by making recursive calls, and we can use conditionals to prevent recursion ad infinitum.
 \end{enumerate}
 
 \textbf{INCOMPLETE}
 
 \section*{Question 7}
-\texttt{Vl} is a stack that stores the values of variables. There is one variable in each function call, and so we have one variable on the stack for each function call that is made.
+\texttt{Vl} stores the values of variable, which is the argument to the current function call.
 \end{document}

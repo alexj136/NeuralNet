@@ -4,7 +4,7 @@ read X // X is ((E.B).D) where D is the program argument, E is the expression be
 	Vl := tl X; // The program's argument
 	St := nil; // Computation stack
 	while Cd do
-		nextstep := <STEPF.wcl> (list Cd St);
+		nextstep := <STEPF.wcl> (list Cd St Vl);
 		Cd := hd nextstep;
 		St := tl nextstep;
 	X := hd St
