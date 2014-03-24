@@ -9,9 +9,9 @@ class Instance:
         return ''.join(['LABEL: ', str(self.label), ', DATA: ', str(self.data)])
 
 def parseInstances():
+    '''Parse the file training_instances.txt into a list of Instance objects'''
     # Get the file as a string
-    with open('training_data.txt', 'r') as f:
-        text = f.read()
+    with open('training_data.txt', 'r') as f: text = f.read()
 
     # Split the string into a list of lines
     lines = text.split('\n')
@@ -34,9 +34,3 @@ def ensureSameDimensionality(valueMatrix):
     for row in valueMatrix:
         if len(row) != dimensionality:
             raise Exception('Parsed data has varying dimensionality')
-
-if __name__ == '__main__':
-    i = parseInstances()
-    for line in i:
-        print line
-    print '----', str(len(i)), '----'
