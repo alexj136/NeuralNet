@@ -1,7 +1,7 @@
-from math      import e     as eMath
 from instances import *
 from random    import gauss as gaussRandom
-from numpy     import dot
+import numpy as np
+import math
 
 class Network:
     def __init__(self, layers):
@@ -45,6 +45,14 @@ class Network:
         for layer in self.layers:
             vec = [node.activation(vec) for node in layer.nodes]
         return vec
+
+    def crossVal(self, bins, insts):
+        '''Perform cross-validation of this network on the given instances with
+        a given number of bins.'''
+        # Break the instance list up into a list of n lists where n = bins
+        sets = map(lambda arr: arr.tolist(), np.split(np.array(insts), bins))
+
+        raise Exception('crossVal not yet implemented - need an error function')
 
 class Layer:
     def __init__(self, nodes):
@@ -122,14 +130,14 @@ class Node:
         input must match the number of weights (not including the bias) of this
         node. The retured value is the dot product of the input vector with the
         weight vector, plus the bias, fed into a sigmoid function.'''
-        return sigmoid(dot(vec, self.wts[1:]) + self.wts[0], 1)
+        return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0], 1)
 
 def sigmoid(x, a):
     '''The sigmoid function is defined as:
         sigmoid(x) = 1 / 1 - e^(-1 * a * x)
     where 'x' is a variable and 'a' and is a specified coefficient. The function
     is used when computing the activation of a Node.'''
-    return 1 / (1 + (eMath ** (-1 * a * x)))
+    return 1 / (1 + (math.e ** (-1 * a * x)))
 
 if __name__ == '__main__':
     insts = parseInstances()
