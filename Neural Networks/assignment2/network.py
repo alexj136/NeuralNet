@@ -1,5 +1,7 @@
+from math      import e     as eMath
 from instances import *
-from random import gauss as gaussRandom
+from random    import gauss as gaussRandom
+from numpy     import dot
 
 class Network:
     def __init__(self, layers):
@@ -36,10 +38,13 @@ class Network:
             dims if x == 0 else layout[x-1], layout[x])
             for x in range(len(layout))])
 
-    def fwdPass(inst):
+    def fwdPass(self, inst):
         '''Given an input instance, apply the network to produce an output
         vector'''
-        pass
+        vec = inst.data
+        for layer in self.layers:
+            vec = [node.activation(vec) for node in layer.nodes]
+        return vec
 
 class Layer:
     def __init__(self, nodes):
@@ -110,9 +115,24 @@ class Node:
         deviation'''
         return Node([gaussRandom(mean, stdDev) for x in range(numInputs + 1)])
 
+    def activation(self, vec):
+        '''Compute the activation of the given input vector for this node. The
+        given input vector may be an instance or a vector of values from a
+        previous layer. The only constraint is that the dimensionality of the
+        input must match the number of weights (not including the bias) of this
+        node. The retured value is the dot product of the input vector with the
+        weight vector, plus the bias, fed into a sigmoid function.'''
+        return sigmoid(dot(vec, self.wts[1:]) + self.wts[0], 1)
+
+def sigmoid(x, a):
+    '''The sigmoid function is defined as:
+        sigmoid(x) = 1 / 1 - e^(-1 * a * x)
+    where 'x' is a variable and 'a' and is a specified coefficient. The function
+    is used when computing the activation of a Node.'''
+    return 1 / (1 + (eMath ** (-1 * a * x)))
+
 if __name__ == '__main__':
-    myNet = Network.gaussWtsNet(0, 0.3, 13, [3, 2, 1])
-    print myNet
-    print myNet.layer(1).node(1).wt(1)
-    myNet.layer(0).node(1).setWt(1, 12)
-    print myNet
+    insts = parseInstances()
+    net = Network.gaussWtsNet(0, 0.3, 13, [13, 13, 2])
+    print str(insts[0].label)
+    print str(net.fwdPass(insts[0]))
