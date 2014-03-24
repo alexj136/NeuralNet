@@ -46,14 +46,6 @@ class Network:
             vec = [node.activation(vec) for node in layer.nodes]
         return vec
 
-    def crossVal(self, bins, insts):
-        '''Perform cross-validation of this network on the given instances with
-        a given number of bins.'''
-        # Break the instance list up into a list of n lists where n = bins
-        sets = map(lambda arr: arr.tolist(), np.split(np.array(insts), bins))
-
-        raise Exception('crossVal not yet implemented - need an error function')
-
 class Layer:
     def __init__(self, nodes):
         '''Build a new Layer from a list of nodes'''
@@ -138,6 +130,26 @@ def sigmoid(x, a):
     where 'x' is a variable and 'a' and is a specified coefficient. The function
     is used when computing the activation of a Node.'''
     return 1 / (1 + (math.e ** (-1 * a * x)))
+
+def crossVal(bins, insts, net):
+    '''Perform cross-validation of this network on the given instances with
+    a given number of bins. A good measure of generalisation error.'''
+    # Break the instance list up into a list of n lists where n = bins
+    sets = map(lambda arr: arr.tolist(), np.split(np.array(insts), bins))
+    setIndex = 0
+    while setIndex < bins:
+        testInsts  = sets[setIndex]
+        trainInsts = sets[:setIndex] + sets[setIndex + 1:]
+
+        #net.train(trainInsts)
+
+        # Will fail - inst.label and net.fwdPass(inst) should be vectors, not values
+        errs = [math.fabs(net.fwdPass(inst) - inst.label) for inst in testInsts]
+
+        setIndex = setIndex + 1
+
+    raise Exception('crossVal not yet implemented - need an error function')
+    raise Exception('crossVal not yet implemented - need a training procedure')
 
 if __name__ == '__main__':
     insts = parseInstances()
