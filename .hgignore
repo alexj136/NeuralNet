@@ -1,11 +1,6 @@
-Human-Computer Interaction/context-eps-converted-to.pdf
-Human-Computer Interaction/learning-diary.aux
-Human-Computer Interaction/learning-diary.log
-Human-Computer Interaction/learning-diary.pdf
-Neural Networks/assignment1/assignment1.aux
-Neural Networks/assignment1/assignment1.log
-Neural Networks/assignment1/assignment1.pdf
-Neural Networks/assignment1/assignment1.pyc
-Limits Of Computation/assignment1.aux
-Limits Of Computation/assignment1.log
-Limits Of Computation/assignment1.pdf
+syntax: glob
+*.aux
+*.log
+*.pdf
+*.pyc
+*.swp
