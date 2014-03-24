@@ -124,11 +124,11 @@ class Node:
         weight vector, plus the bias, fed into a sigmoid function.'''
         return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0], 1)
 
-def sigmoid(x, a):
+def sigmoid(x, a=1):
     '''The sigmoid function is defined as:
         sigmoid(x) = 1 / 1 - e^(-1 * a * x)
-    where 'x' is a variable and 'a' and is a specified coefficient. The function
-    is used when computing the activation of a Node.'''
+    where 'x' is a variable and 'a' and is an optionally specified coefficient.
+    The function is used when computing the activation of a Node.'''
     return 1 / (1 + (math.e ** (-1 * a * x)))
 
 def crossVal(bins, insts, net):
