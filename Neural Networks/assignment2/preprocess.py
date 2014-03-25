@@ -21,7 +21,7 @@ def demean(insts):
         mean = total / len(insts)
 
         # Record this mean
-        means.append[mean]
+        means.append(mean)
 
         # Subtract the mean from each value
         for inst in insts:
@@ -57,12 +57,12 @@ def scale(insts):
                 absMax = abs(inst.data[feat])
 
         # Record this scale factor
-        scaleFacs.append[absMax]
+        scaleFacs.append(absMax)
 
         # Divide each feature value by the scale factor
         for inst in insts:
             inst.data[feat] = inst.data[feat] / absMax
-    
+
     return scaleFacs
 
 def scaleNewInst(inst, scaleFacs):

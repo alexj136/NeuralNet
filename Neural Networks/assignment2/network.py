@@ -143,16 +143,11 @@ def crossVal(bins, insts, net):
 
         #net.train(trainInsts)
 
-        # Will fail - inst.label and net.fwdPass(inst) should be vectors, not values
+        # Will fail - inst.label and net.fwdPass(inst) should be vectors, not
+        # values
         errs = [abs(net.fwdPass(inst) - inst.label) for inst in testInsts]
 
         setIndex = setIndex + 1
 
     raise Exception('crossVal not yet implemented - need an error function')
     raise Exception('crossVal not yet implemented - need a training procedure')
-
-if __name__ == '__main__':
-    insts = parseInstances()
-    net = Network.gaussWtsNet(0, 0.3, 13, [13, 13, 2])
-    print str(insts[0].label)
-    print str(net.fwdPass(insts[0]))
