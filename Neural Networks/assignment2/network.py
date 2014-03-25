@@ -144,7 +144,7 @@ def crossVal(bins, insts, net):
         #net.train(trainInsts)
 
         # Will fail - inst.label and net.fwdPass(inst) should be vectors, not values
-        errs = [math.fabs(net.fwdPass(inst) - inst.label) for inst in testInsts]
+        errs = [abs(net.fwdPass(inst) - inst.label) for inst in testInsts]
 
         setIndex = setIndex + 1
 
