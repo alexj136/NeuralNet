@@ -46,6 +46,26 @@ class Network:
             vec = [node.activation(vec) for node in layer.nodes]
         return vec
 
+    def trainBackProp(self, insts, rate, iters):
+        '''Train the network using the back propagation algorithm, for a given
+        set of instances and a given learning rate'''
+
+        for x in range(iters):
+
+            for inst in insts:
+                # Evaluate the forward pass result
+                out = self.fwdPass(inst)
+
+                # Compute the distance between the forward pass result and the
+                # instance label (i.e. the error)
+                err = euclideanDist(inst.label, out)
+
+                # Update the weights for the output layer
+                for node in self.layers[len(self.layers)-1]
+                    pass
+
+        raise Exception('Error - trainBackProp not yet implemented')
+
 class Layer:
     def __init__(self, nodes):
         '''Build a new Layer from a list of nodes'''
@@ -124,12 +144,20 @@ class Node:
         weight vector, plus the bias, fed into a sigmoid function.'''
         return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0], 1)
 
+    def derivActvn(self, vec):
+        '''Compute the derivative of the activation function for this Node'''
+        return with activation(vec) as a: a * (1 - a)
+
 def sigmoid(x, a=1):
     '''The sigmoid function is defined as:
         sigmoid(x) = 1 / 1 - e^(-1 * a * x)
     where 'x' is a variable and 'a' and is an optionally specified coefficient.
     The function is used when computing the activation of a Node.'''
     return 1 / (1 + (math.e ** (-1 * a * x)))
+
+def euclideanDist(x, y):
+    '''Compute the euclidean distance between two vectors (lists) x and y'''
+    return math.sqrt(sum(map(lambda xi, yi: math.pow(xi - yi, 2), x, y)))
 
 def crossVal(bins, insts, net):
     '''Perform cross-validation of this network on the given instances with
@@ -141,11 +169,8 @@ def crossVal(bins, insts, net):
         testInsts  = sets[setIndex]
         trainInsts = sets[:setIndex] + sets[setIndex + 1:]
 
-        #net.train(trainInsts)
-
-        # Will fail - inst.label and net.fwdPass(inst) should be vectors, not
-        # values
-        errs = [abs(net.fwdPass(inst) - inst.label) for inst in testInsts]
+        errors = [euclideanDist(net.fwdPass(inst), inst.label)
+                for inst in testInsts]
 
         setIndex = setIndex + 1
 

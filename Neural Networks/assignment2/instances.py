@@ -1,12 +1,21 @@
 class Instance:
-    def __init__(self, data):
+    def __init__(self, vec):
         '''Build an instance from a list of values where the last value is the
            class label'''
-        self.data  = data[0:len(data)-1]
-        self.label = data[len(data)-1]
+        self.vec = vec
+        self.vlen = len(vec)    # compute the length now so that we don't have
+                                # to recalculate it for every access
     def __str__(self):
         '''Get a nice string representation of this Instance object'''
         return ''.join(['LABEL: ', str(self.label), ', DATA: ', str(self.data)])
+    @property
+    def data(self):
+        '''Get the data for this instance, without the label'''
+        return self.vec[0:self.vlen-1]
+    @property
+    def label(self):
+        '''Get the label for this instance'''
+        return self.vec[self.vlen-1]
 
 def parseInstances():
     '''Parse the file training_instances.txt into a list of Instance objects'''
