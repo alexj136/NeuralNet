@@ -56,12 +56,12 @@ class Network:
                 # Evaluate the forward pass result
                 out = self.fwdPass(inst)
 
-                # Compute the distance between the forward pass result and the
-                # instance label (i.e. the error)
-                err = euclideanDist(inst.label, out)
+                # Compute the square of the distance between the forward pass
+                # result and the instance label (i.e. the squared error)
+                err = math.pow(euclideanDist(inst.label, out), 2) / 2
 
                 # Update the weights for the output layer
-                for node in self.layers[len(self.layers)-1]
+                for node in self.layers[len(self.layers)-1]:
                     pass
 
         raise Exception('Error - trainBackProp not yet implemented')
@@ -142,18 +142,23 @@ class Node:
         input must match the number of weights (not including the bias) of this
         node. The retured value is the dot product of the input vector with the
         weight vector, plus the bias, fed into a sigmoid function.'''
-        return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0], 1)
+        return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0])
 
-    def derivActvn(self, vec):
-        '''Compute the derivative of the activation function for this Node'''
-        return with activation(vec) as a: a * (1 - a)
-
-def sigmoid(x, a=1):
+def sigmoid(x, k=1):
     '''The sigmoid function is defined as:
-        sigmoid(x) = 1 / 1 - e^(-1 * a * x)
-    where 'x' is a variable and 'a' and is an optionally specified coefficient.
+        sigmoid(x) = 1 / 1 - e^(-1 * k * x)
+    where 'x' is a variable and 'k' and is an optionally specified coefficient.
     The function is used when computing the activation of a Node.'''
-    return 1 / (1 + (math.e ** (-1 * a * x)))
+    return 1 / (1 + (math.e ** (-1 * k * x)))
+
+def derivSigmoid(x, k=1):
+    '''Compute the value of the derivative of the sigmoid function at a given x,
+    with optionally specified constant k. The derivative of the sigmoid function
+    can be shown to be:
+        sig'(x) = k * sig(x) * (1 - sig(x))
+    where k is the same coefficient used in the sigmoid function.'''
+    sigX = sigmoid(x, k)
+    return K * sigX * (1 - sigX)
 
 def euclideanDist(x, y):
     '''Compute the euclidean distance between two vectors (lists) x and y'''
