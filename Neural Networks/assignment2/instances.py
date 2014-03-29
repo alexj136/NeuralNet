@@ -1,21 +1,12 @@
 class Instance:
-    def __init__(self, vec):
-        '''Build an instance from a list of values where the last value is the
-           class label'''
-        self.vec = vec
-        self.vlen = len(vec)    # compute the length now so that we don't have
-                                # to recalculate it for every access
+    def __init__(self, data, label):
+        '''Build an instance from a list of features and a list of target
+        values'''
+        self.data  = data   # The feature values - a list of numbers
+        self.label = label  # The label/target value(s) - also a list of numbers
     def __str__(self):
         '''Get a nice string representation of this Instance object'''
-        return ''.join(['LABEL: ', str(self.label), ', DATA: ', str(self.data)])
-    @property
-    def data(self):
-        '''Get the data for this instance, without the label'''
-        return self.vec[0:self.vlen-1]
-    @property
-    def label(self):
-        '''Get the label for this instance'''
-        return self.vec[self.vlen-1]
+        return ''.join(['DATA: ', str(self.data), ', LABEL: ', str(self.label)])
 
 def parseInstances():
     '''Parse the file training_instances.txt into a list of Instance objects'''
@@ -34,8 +25,15 @@ def parseInstances():
     # Ensure that all the instances have the same dimensionality
     ensureSameDimensionality(floatMatrix)
 
+    # Break the float matrix into separate feature and target value matrices
+    featureMatrix = []
+    targetValMatrix = []
+    for instData in floatMatrix:
+        featureMatrix.append(instData[:len(instData) - 1])
+        targetValMatrix.append([instData[len(instData) - 1]])
+
     # Convert the data matrix into a list of instances and return it
-    return map(Instance, floatMatrix)
+    return map(Instance, featureMatrix, targetValMatrix)
 
 def ensureSameDimensionality(valueMatrix):
     '''Guarantee that, for a list of lists, all lists have the same length'''

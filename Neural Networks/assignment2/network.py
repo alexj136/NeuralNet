@@ -66,25 +66,28 @@ class Network:
                 # Calculate delta values for the output layer - iterate over
                 # each dimension (i.e. each neuron) in the output (layer)
                 deltasOutputLayer = []
-                for index in range(len(activations[len(activations) - 1]):
+                for node in range(len(activations[len(activations) - 1])):
                     # Activation value for this dimension of the output
-                    activn = activations[len(activations) - 1][index]
+                    activn = activations[len(activations) - 1][node]
 
                     # Calculate the delta value
                     deltasOutputLayer.append(
                         -1 * derivSigmoid(activn) *
-                        (inst.label[index] - sigmoid(activn))
+                        (inst.label[node] - sigmoid(activn))
                     )
 
-                # Calculate delta_k values for the hidden layers NOT DONE PROPERLY
+                # Calculate delta values for the hidden layers NOT DONE PROPERLY
                 deltasHiddenLayers = []
                 for layer in range(len(activations)-2, 0, -1):
-                    deltasHiddenLayers.insert(0, [
-                        derivSigmoid(activn) * sum() # for each k that this j leads into
-                            for activn in activations[layer]]
-                    )
+                    deltasCurrentLayer = []
+                    for node in range(len(activations[layer])):
+                        raise Exception(''.join(['trainBackProp: inner delta',
+                            ' calculation not yet implemented']))
+                        #deltasCurrentLayer.append(
+                        #)
+                    deltasHiddenLayers.insert(0, deltasCurrentLayer)
 
-        raise Exception('Error - trainBackProp not yet implemented')
+            raise Exception('trainBackProp: weight update not yet implemented')
 
 class Layer:
     def __init__(self, nodes):
