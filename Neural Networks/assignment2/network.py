@@ -39,11 +39,14 @@ class Network:
             for x in range(len(layout))])
 
     def fwdPass(self, inst):
-        '''Given an input instance, apply the network to produce an output
-        vector'''
-        vec = inst.data
+        '''Given an input instance, apply the network to produce a list
+        containing lists of activiations for each layer'''
+        vec = [inst.data]
         for layer in self.layers:
-            vec = [node.activation(vec) for node in layer.nodes]
+            vec.append(
+                [node.activation(map(sigmoid, vec[len(vec)-1]))
+                    for node in layer.nodes]
+            )
         return vec
 
     def trainBackProp(self, insts, rate, iters):
@@ -54,15 +57,24 @@ class Network:
 
             for inst in insts:
                 # Evaluate the forward pass result
-                out = self.fwdPass(inst)
+                activations = self.fwdPass(inst)
 
                 # Compute the square of the distance between the forward pass
                 # result and the instance label (i.e. the squared error)
                 err = math.pow(euclideanDist(inst.label, out), 2) / 2
 
-                # Update the weights for the output layer
-                for node in self.layers[len(self.layers)-1]:
-                    pass
+                # Calculate delta_k values for the output layer
+                deltasOutputLayer = [-1 * derivSigmoid(activn) *
+                        euclideanDist(inst.label, sigmoid(activn))
+                        for activn in activations[len(activations)-1]]
+
+                # Calculate delta_k values for the hidden layers
+                deltasHiddenLayers = []
+                for layer in range(len(activations)-2, 0, -1):
+                    deltasHiddenLayers.insert(0, [
+                        derivSigmoid(activn) * sum() # for each k that this j leads into
+                            for activn in activations[layer]]
+                    )
 
         raise Exception('Error - trainBackProp not yet implemented')
 
@@ -142,7 +154,7 @@ class Node:
         input must match the number of weights (not including the bias) of this
         node. The retured value is the dot product of the input vector with the
         weight vector, plus the bias, fed into a sigmoid function.'''
-        return sigmoid(np.dot(vec, self.wts[1:]) + self.wts[0])
+        return np.dot(vec, self.wts[1:]) + self.wts[0]
 
 def sigmoid(x, k=1):
     '''The sigmoid function is defined as:
