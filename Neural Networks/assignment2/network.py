@@ -63,12 +63,20 @@ class Network:
                 # result and the instance label (i.e. the squared error)
                 err = math.pow(euclideanDist(inst.label, out), 2) / 2
 
-                # Calculate delta_k values for the output layer
-                deltasOutputLayer = [-1 * derivSigmoid(activn) *
-                        euclideanDist(inst.label, sigmoid(activn))
-                        for activn in activations[len(activations)-1]]
+                # Calculate delta values for the output layer - iterate over
+                # each dimension (i.e. each neuron) in the output (layer)
+                deltasOutputLayer = []
+                for index in range(len(activations[len(activations) - 1]):
+                    # Activation value for this dimension of the output
+                    activn = activations[len(activations) - 1][index]
 
-                # Calculate delta_k values for the hidden layers
+                    # Calculate the delta value
+                    deltasOutputLayer.append(
+                        -1 * derivSigmoid(activn) *
+                        (inst.label[index] - sigmoid(activn))
+                    )
+
+                # Calculate delta_k values for the hidden layers NOT DONE PROPERLY
                 deltasHiddenLayers = []
                 for layer in range(len(activations)-2, 0, -1):
                     deltasHiddenLayers.insert(0, [
