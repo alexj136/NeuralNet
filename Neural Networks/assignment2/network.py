@@ -17,6 +17,16 @@ class Network:
         '''Get the layer of the given number'''
         return self.layers[layerNo]
 
+    @property
+    def outputLayer(self):
+        '''Get the output layer of this Network'''
+        return self.layers[len(self.layers) - 1]
+
+    @property
+    def hiddenLayers(self):
+        '''Get the hidden layers of this Network'''
+        return self.layers[:len(self.layers) - 1]
+
     @staticmethod
     def zeroWtsNet(dims, layout):
         '''Create a network from the given layout, for data with dimensionality
@@ -39,14 +49,18 @@ class Network:
             for x in range(len(layout))])
 
     def fwdPass(self, inst):
-        '''Given an input instance, apply the network to produce a list
-        containing lists of activiations for each layer'''
-        vec = [inst.data]
+        '''Given an input instance, calculate all node activations to produce an
+        output vector - a prediction for the given instance'''
+
+        vec = inst.data
+
         for layer in self.layers:
-            vec.append(
-                [node.activation(map(sigmoid, vec[len(vec)-1]))
-                    for node in layer.nodes]
-            )
+
+            for node in layer.nodes:
+                node.activn = node.activation(vec)
+
+            vec = [sigmoid(node.activn) for node in layer.nodes]
+
         return vec
 
     def trainBackProp(self, insts, rate, iters):
@@ -56,36 +70,47 @@ class Network:
         for x in range(iters):
 
             for inst in insts:
-                # Evaluate the forward pass result
-                activations = self.fwdPass(inst)
+                # Pass the instance through the network so that node activations
+                # correspond to this instance, and to get the network's output
+                # for this instance
+                out = self.fwdPass(inst)
 
-                # Compute the square of the distance between the forward pass
-                # result and the instance label (i.e. the squared error)
-                err = math.pow(euclideanDist(inst.label, out), 2) / 2
+                # Update delta values for the output layer
+                for nodeNo in range(len(out)):
+                    node = self.outputLayer.nodes[nodeNo]
+                    node.delta = -1 * derivSigmoid(node.activn) *
+                            (inst.label[nodeNo] - out[nodeNo])
 
-                # Calculate delta values for the output layer - iterate over
-                # each dimension (i.e. each neuron) in the output (layer)
-                deltasOutputLayer = []
-                for node in range(len(activations[len(activations) - 1])):
-                    # Activation value for this dimension of the output
-                    activn = activations[len(activations) - 1][node]
+                # Update delta values for the hidden layers
+                for layerNo in range(len(self.hiddenLayers)):
+                    layer = self.layers[layerNo]
 
-                    # Calculate the delta value
-                    deltasOutputLayer.append(
-                        -1 * derivSigmoid(activn) *
-                        (inst.label[node] - sigmoid(activn))
-                    )
+                    for nodeNo in range(len(layer)):
+                        node = layer.nodes[nodeNo]
 
-                # Calculate delta values for the hidden layers NOT DONE PROPERLY
-                deltasHiddenLayers = []
-                for layer in range(len(activations)-2, 0, -1):
-                    deltasCurrentLayer = []
-                    for node in range(len(activations[layer])):
-                        raise Exception(''.join(['trainBackProp: inner delta',
-                            ' calculation not yet implemented']))
-                        #deltasCurrentLayer.append(
-                        #)
-                    deltasHiddenLayers.insert(0, deltasCurrentLayer)
+                        # To calculate the value of the sum in the delta
+                        # equation, iterate over every node in the next layer,
+                        # calculating the product of each node's delta with the
+                        # weighting it gives to this node
+                        sumVal = 0
+                        for toNode in self.layers[layerNo + 1]:
+                            sumVal = sumVal +
+                                    (toNode.delta * toNode.wts[nodeNo + 1])
+                                    # nodeNo + 1 because wts[0] is the bias
+
+                        node.delta = derivSigmoid(node.activn) * sumVal
+
+                # Update the weights for the input layer
+                for node in self.layers[0]:
+                    node.wts[0] = node.wts[0] - (rate * node.delta)
+                    for inputVal in range(len(inst.data)):
+                        node.wts[inputVal + 1] = node.wts[inputVal + 1] -
+                                (rate * node.delta * inst.data[inputVal])
+
+                # Update the weights for the layers after the input layer
+                for layer in self.layers[1:]:
+                    for node in layer:
+                        node.wts[0] = node.wts[0] - (rate * node.delta)
 
             raise Exception('trainBackProp: weight update not yet implemented')
 
@@ -126,7 +151,10 @@ class Node:
 
     def __init__(self, wts):
         '''Build a new Node from a weight vector'''
-        self.wts = wts
+        self.wts    = wts
+        self.delta  = None  # It is very helpful when doing backpropagation, to
+        self.activn = None  # be able to store delta and activation values in
+                            # the nodes that they correspond to
 
     def __str__(self):
         '''Get a nice string representation of this Node object'''
