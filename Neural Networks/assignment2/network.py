@@ -6,7 +6,9 @@ import math
 class Network:
     def __init__(self, layers):
         '''Build a new Network from a list of Layers'''
-        self.layers = layers
+        self.layers        = layers
+        self.initWtsMean   = None
+        self.initWtsStdDev = None
 
     def __str__(self):
         '''Get a nice string representation of this Network object'''
@@ -44,9 +46,24 @@ class Network:
         every weight (including biases) is initialised with a normally
         distributed random number drawn from a distribution with the specified
         mean and standard deviation'''
-        return Network([Layer.gaussWtsLayer(mean, stdDev,
+        net = Network([Layer.gaussWtsLayer(mean, stdDev,
             dims if x == 0 else layout[x-1], layout[x])
             for x in range(len(layout))])
+        net.initWtsMean   = mean
+        net.initWtsStdDev = stdDev
+        return net
+
+    def resetGauss(self):
+        '''Reset all weights and stored delta/activation values in this network
+        to freshly generated gaussian weights with the same mean and standard
+        deviation as was initially used to create this Network. if gaussWtsNet()
+        was not used to create this Network, then that data is not available, so
+        an error is raised.'''
+        for layerIndex in range(len(self.layers)):
+            self.layers[layerIndex] = Layer.gaussWtsLayer(self.initWtsMean,
+                    self.initWtsStdDev,
+                    len(self.layers[layerIndex].nodes[0].wts) - 1,
+                    len(self.layers[layerIndex].nodes))
 
     def fwdPass(self, inst):
         '''Given an input instance, calculate all node activations to produce an
@@ -78,14 +95,14 @@ class Network:
                 # Update delta values for the output layer
                 for nodeNo in range(len(out)):
                     node = self.outputLayer.nodes[nodeNo]
-                    node.delta = -1 * derivSigmoid(node.activn) *
-                            (inst.label[nodeNo] - out[nodeNo])
+                    node.delta = -1 * derivSigmoid(node.activn) * (
+                            inst.label[nodeNo] - out[nodeNo])
 
                 # Update delta values for the hidden layers
                 for layerNo in range(len(self.hiddenLayers)):
                     layer = self.layers[layerNo]
 
-                    for nodeNo in range(len(layer)):
+                    for nodeNo in range(len(layer.nodes)):
                         node = layer.nodes[nodeNo]
 
                         # To calculate the value of the sum in the delta
@@ -93,26 +110,32 @@ class Network:
                         # calculating the product of each node's delta with the
                         # weighting it gives to this node
                         sumVal = 0
-                        for toNode in self.layers[layerNo + 1]:
-                            sumVal = sumVal +
-                                    (toNode.delta * toNode.wts[nodeNo + 1])
+                        for toNode in self.layers[layerNo + 1].nodes:
+                            sumVal = sumVal + (
+                                    toNode.delta * toNode.wts[nodeNo + 1])
                                     # nodeNo + 1 because wts[0] is the bias
 
                         node.delta = derivSigmoid(node.activn) * sumVal
 
                 # Update the weights for the input layer
-                for node in self.layers[0]:
+                for node in self.layers[0].nodes:
                     node.wts[0] = node.wts[0] - (rate * node.delta)
                     for inputVal in range(len(inst.data)):
-                        node.wts[inputVal + 1] = node.wts[inputVal + 1] -
-                                (rate * node.delta * inst.data[inputVal])
+                        node.wts[inputVal + 1] = node.wts[inputVal + 1] - (
+                                rate * node.delta * inst.data[inputVal])
 
                 # Update the weights for the layers after the input layer
-                for layer in self.layers[1:]:
-                    for node in layer:
-                        node.wts[0] = node.wts[0] - (rate * node.delta)
+                for layerNo in range(1, len(self.layers)):
 
-            raise Exception('trainBackProp: weight update not yet implemented')
+                    for nodeNo in range(len(self.layers[layerNo].nodes)):
+                        node = self.layers[layerNo].nodes[nodeNo]
+
+                        node.wts[0] = node.wts[0] - (rate * node.delta)
+                        wtIndex = 1
+                        for inputNode in self.layers[layerNo - 1].nodes:
+                            node.wts[wtIndex] = node.wts[wtIndex] - (rate *
+                                    node.delta * sigmoid(inputNode.activn))
+                            wtIndex = wtIndex + 1
 
 class Layer:
     def __init__(self, nodes):
@@ -209,26 +232,8 @@ def derivSigmoid(x, k=1):
         sig'(x) = k * sig(x) * (1 - sig(x))
     where k is the same coefficient used in the sigmoid function.'''
     sigX = sigmoid(x, k)
-    return K * sigX * (1 - sigX)
+    return k * sigX * (1 - sigX)
 
 def euclideanDist(x, y):
     '''Compute the euclidean distance between two vectors (lists) x and y'''
     return math.sqrt(sum(map(lambda xi, yi: math.pow(xi - yi, 2), x, y)))
-
-def crossVal(bins, insts, net):
-    '''Perform cross-validation of this network on the given instances with
-    a given number of bins. A good measure of generalisation error.'''
-    # Break the instance list up into a list of n lists where n = bins
-    sets = map(lambda arr: arr.tolist(), np.split(np.array(insts), bins))
-    setIndex = 0
-    while setIndex < bins:
-        testInsts  = sets[setIndex]
-        trainInsts = sets[:setIndex] + sets[setIndex + 1:]
-
-        errors = [euclideanDist(net.fwdPass(inst), inst.label)
-                for inst in testInsts]
-
-        setIndex = setIndex + 1
-
-    raise Exception('crossVal not yet implemented - need an error function')
-    raise Exception('crossVal not yet implemented - need a training procedure')
