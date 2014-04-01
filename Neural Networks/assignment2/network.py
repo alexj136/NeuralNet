@@ -15,6 +15,18 @@ class Network:
         return ''.join([''.join(["--- LAYER ", str(x), " ---\n",
             str(self.layers[x]), "\n"]) for x in range(len(self.layers))])
 
+    def printDeltas(self):
+        '''Print all nodes with their current delta values'''
+        layerNo = 0
+        for layer in self.layers:
+            print '--- LAYER', str(layerNo), '---'
+            layerNo = layerNo + 1
+
+            nodeNo = 0
+            for node in layer.nodes:
+                print 'NODE', str(nodeNo), '- DELTA =', str(node.delta)
+                nodeNo = nodeNo + 1
+
     def layer(self, layerNo):
         '''Get the layer of the given number'''
         return self.layers[layerNo]
@@ -23,11 +35,6 @@ class Network:
     def outputLayer(self):
         '''Get the output layer of this Network'''
         return self.layers[len(self.layers) - 1]
-
-    @property
-    def hiddenLayers(self):
-        '''Get the hidden layers of this Network'''
-        return self.layers[:len(self.layers) - 1]
 
     @staticmethod
     def zeroWtsNet(dims, layout):
@@ -99,7 +106,7 @@ class Network:
                             inst.label[nodeNo] - out[nodeNo])
 
                 # Update delta values for the hidden layers
-                for layerNo in range(len(self.hiddenLayers)):
+                for layerNo in range(len(self.layers) - 2, -1, -1):
                     layer = self.layers[layerNo]
 
                     for nodeNo in range(len(layer.nodes)):
@@ -136,6 +143,7 @@ class Network:
                             node.wts[wtIndex] = node.wts[wtIndex] - (rate *
                                     node.delta * sigmoid(inputNode.activn))
                             wtIndex = wtIndex + 1
+
 
 class Layer:
     def __init__(self, nodes):

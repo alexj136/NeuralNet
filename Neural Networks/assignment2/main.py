@@ -28,7 +28,7 @@ def crossVal(bins, insts, net):
                 trainInsts.append(inst)
 
         net.resetGauss()
-        net.trainBackProp(trainInsts, 0.1, 10)
+        net.trainBackProp(trainInsts, 0.1, 100)
 
         errors = [euclideanDist(net.fwdPass(inst), inst.label)
                 for inst in testInsts]
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     meanInst  = demean(insts)
     scaleInst = scale(insts)
 
-    net = Network.gaussWtsNet(0, 0.3, 13, [4, 1])
+    net = Network.gaussWtsNet(0, 0.3, 13, [13, 13, 1])
 
     err = crossVal(10, insts, net)
 
