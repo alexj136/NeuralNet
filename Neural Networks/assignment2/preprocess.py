@@ -1,10 +1,11 @@
 from instances import Instance
+from copy      import deepcopy
 
 def demean(insts):
-    '''Demean the set of instances. This amounts to adding or subtracting a
-    fixed value from each value for each instance such that the mean of each
-    feature is zero. Returns a list of the original mean values of each feature
-    so that the same transformation can be applied to unseen instances.'''
+    '''Produce a new list of instances from the given ones, that have been
+    demeaned. Return a new list, and an Instance object that represents the mean
+    values of the data from the original instances, that can be used to demean
+    unseen instances, or to recover values in the original domain'''
 
     # We record the original mean of each feature and return them in a list, so
     # that we can (a) apply an identical transformation to unseen instances and
@@ -25,51 +26,52 @@ def demean(insts):
         # Record this mean
         featMeans.append(mean)
 
-        # Subtract the mean from each value
-        for inst in insts:
-            inst.data[feat] = inst.data[feat] - mean
+    labelMeans = []    
 
-    targetValMeans = []    
-
-    for targetDim in range(len(insts[0].label)):
+    for lbl in range(len(insts[0].label)):
 
         # Compute the sum total of all values for this dimension of the target
         # in order to find the mean by dividing by the number of instances
         total = 0
         for inst in insts:
-            total = total + inst.label[targetDim]
+            total = total + inst.label[lbl]
 
         # Calculate the mean
         mean = total / len(insts)
 
         # Record this mean
-        targetValMeans.append(mean)
+        labelMeans.append(mean)
 
-        # Subtract the mean from each value
-        for inst in insts:
-            inst.label[targetDim] = inst.label[targetDim] - mean
+    # Create new instances from the old ones and adjust all values appropriately
+    newInsts = deepcopy(insts)
+    for inst in newInsts:
+        for d in range(len(inst.data)):
+            inst.data[d] = inst.data[d] - featMeans[d]
+        for l in range(len(inst.label)):
+            inst.label[l] = inst.label[l] - labelMeans[l]
     
-    return Instance(featMeans, targetValMeans)
+    return newInsts, Instance(featMeans, labelMeans)
 
 def demeanNewInst(inst, means):
-    '''Given an instance and a set of mean values for data returned by
-    demean() stored in an Instance obhect, subtract each mean from its
-    corresponding feature/target value in the given instance.'''
-    for feat in range(len(inst.data)):
-        inst.data[feat] = inst.data[feat] - means.data[feat]
-    for targetDim in range(len(inst.label)):
-        inst.label[targetDim] = inst.label[targetDim] - means.label[targetDim]
+    '''Given an unseen Instance and an example mean Instance, return a new
+    instance in the same domain as the data that produced the example
+    Instance'''
+    newInst = deepcopy(inst)
+    for feat in range(len(newInst.data)):
+        newInst.data[feat] = newInst.data[feat] - means.data[feat]
+    for lbl in range(len(newInst.label)):
+        newInst.label[lbl] = newInst.label[lbl] - means.label[lbl]
+    return newInst
 
 def scale(insts):
-    '''Scale a set of instances. This amounts to dividing the value of each
-    feature by the absolute value of the maximum value for that feature in the
-    data set. As with demean, we return a list of scale factors used so that we
-    can apply the same scaling to unseen instances.'''
+    '''Produce a list of Instances that are scaled versions of the given
+    Instances. Return the new instances and an example Instance that stores the
+    scale factors for each dimension of the given instances.'''
 
     # We record the scale factor for feature and return them in a list, so
     # that we can (a) apply an identical transformation to unseen instances and
     # (b) recover the feature values as they were before scaling
-    featScaleFacs = []
+    featScales = []
 
     for feat in range(len(insts[0].data)):
 
@@ -81,38 +83,39 @@ def scale(insts):
                 absMax = abs(inst.data[feat])
 
         # Record this scale factor
-        featScaleFacs.append(absMax)
+        featScales.append(absMax)
 
-        # Divide each feature value by the scale factor
-        for inst in insts:
-            inst.data[feat] = inst.data[feat] / absMax
+    labelScales = []    
 
-    targetValScaleFacs = []    
-
-    for targetDim in range(len(insts[0].label)):
+    for lbl in range(len(insts[0].label)):
 
         # Find the maximum value for this target dimension, which we will use as
         # our scale factor
         absMax = 0
         for inst in insts:
-            if abs(inst.label[targetDim]) > absMax:
-                absMax = abs(inst.label[targetDim])
+            if abs(inst.label[lbl]) > absMax:
+                absMax = abs(inst.label[lbl])
 
         # Record this scale factor
-        targetValScaleFacs.append(absMax)
+        labelScales.append(absMax)
 
-        # Divide each target value by the scale factor
-        for inst in insts:
-            inst.label[targetDim] = inst.label[targetDim] / absMax
+    # Create new instances from the old ones and adjust all values appropriately
+    newInsts = deepcopy(insts)
+    for inst in newInsts:
+        for d in range(len(inst.data)):
+            inst.data[d] = inst.data[d] / featScales[d]
+        for l in range(len(inst.label)):
+            inst.label[l] = inst.label[l] / labelScales[l]
 
-    return Instance(featScaleFacs, targetValScaleFacs)
+    return newInsts, Instance(featScales, labelScales)
 
 def scaleNewInst(inst, scaleFacs):
-    '''Given an instance and a set of scale factors for data returned by
-    scale() stored in an Instance object, divide each feature value by the
-    corresponding scale factor.'''
-    for feat in range(len(inst.data)):
-        inst.data[feat] = inst.data[feat] / scaleFacs.data[feat]
-    for targetDim in range(len(inst.label)):
-        inst.label[targetDim] = \
-                inst.label[targetDim] / scaleFacs.label[targetDim]
+    '''Given an instance and a scale factor example Instance, for data returned
+    by scale(), return a new instance that is equivalent to the given instance,
+    but in the scaled domain.'''
+    newInst = deepcopy(inst)
+    for feat in range(len(newInst.data)):
+        newInst.data[feat] = newInst.data[feat] / scaleFacs.data[feat]
+    for lbl in range(len(newInst.label)):
+        newInst.label[lbl] = newInst.label[lbl] / scaleFacs.label[lbl]
+    return newInst

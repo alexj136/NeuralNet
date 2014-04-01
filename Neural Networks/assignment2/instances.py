@@ -4,11 +4,12 @@ class Instance:
         values'''
         self.data  = data   # The feature values - a list of numbers
         self.label = label  # The label/target value(s) - also a list of numbers
+
     def __str__(self):
         '''Get a nice string representation of this Instance object'''
         return ''.join(['DATA: ', str(self.data), ', LABEL: ', str(self.label)])
-
-def parseInstances():
+    
+def parseTrainingData():
     '''Parse the file training_instances.txt into a list of Instance objects'''
     # Get the file as a string
     with open('training_data.txt', 'r') as f: text = f.read()
