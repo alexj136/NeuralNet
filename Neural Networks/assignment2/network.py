@@ -7,8 +7,6 @@ class Network:
     def __init__(self, layers):
         '''Build a new Network from a list of Layers'''
         self.layers        = layers
-        self.initWtsMean   = None
-        self.initWtsStdDev = None
 
     def __str__(self):
         '''Get a nice string representation of this Network object'''
@@ -37,40 +35,24 @@ class Network:
         return self.layers[len(self.layers) - 1]
 
     @staticmethod
-    def zeroWtsNet(dims, layout):
-        '''Create a network from the given layout, for data with dimensionality
-        given by the dims parameter. A layout is a list of integers that
-        specifies the network's configuration, e.g. a layout of [2, 9, 4, 1]
-        will produce a network with an input layer with two nodes, two hidden
-        layers, the first with 9 nodes and the second with 4, and an output
-        layer with one node. All weights are initialised to zero.'''
-        return Network([Layer.zeroWtsLayer(dims if x == 0 else layout[x-1],
-            layout[x]) for x in range(len(layout))])
+    def zeroWtsNet(layout):
+        '''Create a network from the given layout. A layout is a list of
+        integers that specifies the network's configuration, e.g. a layout of
+        [2, 9, 4, 1] will produce a network with an input layer with two nodes
+        (i.e. the input data has two features), two hidden layers, the first
+        with 9 nodes and the second with 4, and an output layer with one node.
+        All weights are initialised to zero.'''
+        return Network([Layer.zeroWtsLayer(layout[x-1], layout[x])
+                for x in range(1, len(layout))])
 
     @staticmethod
-    def gaussWtsNet(mean, stdDev, dims, layout):
+    def gaussWtsNet(mean, stdDev, layout):
         '''Like zeroWtsNet, but instead of initialising all weights to zero,
         every weight (including biases) is initialised with a normally
         distributed random number drawn from a distribution with the specified
         mean and standard deviation'''
-        net = Network([Layer.gaussWtsLayer(mean, stdDev,
-            dims if x == 0 else layout[x-1], layout[x])
-            for x in range(len(layout))])
-        net.initWtsMean   = mean
-        net.initWtsStdDev = stdDev
-        return net
-
-    def resetGauss(self):
-        '''Reset all weights and stored delta/activation values in this network
-        to freshly generated gaussian weights with the same mean and standard
-        deviation as was initially used to create this Network. if gaussWtsNet()
-        was not used to create this Network, then that data is not available, so
-        an error is raised.'''
-        for layerIndex in range(len(self.layers)):
-            self.layers[layerIndex] = Layer.gaussWtsLayer(self.initWtsMean,
-                    self.initWtsStdDev,
-                    len(self.layers[layerIndex].nodes[0].wts) - 1,
-                    len(self.layers[layerIndex].nodes))
+        return Network([Layer.gaussWtsLayer(mean, stdDev, layout[x-1],
+                layout[x]) for x in range(1, len(layout))])
 
     def fwdPass(self, inst):
         '''Given an input instance, calculate all node activations to produce an

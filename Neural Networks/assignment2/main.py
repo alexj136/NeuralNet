@@ -23,6 +23,18 @@ def flatten(lists):
     bins(), the given list is not modified, but data is not copied.'''
     return [elem for lst in lists for elem in lst]
 
+def trainNet(mean, stdDev, layout, trainInsts, rate, iters):
+    '''Train a network with the given training instances, initialised with
+    random weights drawn from a gaussian distribution with the given mean and
+    standard deviation. The Network will have the given layout (see the
+    docstring for Network.gaussWtsNet()), and will be trained with the given
+    learning rate, for the given number of iterations.'''
+
+    net = Network.gaussWtsNet(mean, stdDev, layout)
+    net.trainBackProp(trainInsts, rate, iters)
+
+    return net
+
 def crossVal(n, insts, net):
     '''Perform cross-validation of this implementation on the given instances
     with a given n = number of bins. A good measure of generalisation error.'''
@@ -34,7 +46,6 @@ def crossVal(n, insts, net):
         testInsts  = sets[setIndex]
         trainInsts = flatten(sets[:setIndex] + sets[setIndex + 1:])
 
-        net.resetGauss()
         net.trainBackProp(trainInsts, 0.05, 300)
 
         errors = [euclideanDist(net.fwdPass(inst), inst.label)
