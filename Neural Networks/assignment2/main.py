@@ -35,34 +35,40 @@ def trainNet(mean, stdDev, layout, trainInsts, rate, iters):
 
     return net
 
-def crossVal(n, insts, net):
-    '''Perform cross-validation of this implementation on the given instances
-    with a given n = number of bins. A good measure of generalisation error.'''
+def testNet(net, testInsts):
+    '''Test this network with the given test instances. Return the mean
+    euclidean distance of the target output from the actual output.'''
+    return sum([euclideanDist(net.fwdPass(inst), inst.label)
+            for inst in testInsts])/len(testInsts)
 
-    sets = bins(10, insts)
-    avgErrors = []
+def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
 
-    for setIndex in range(n):
+    sets = bins(numBins, insts)
+    trainErrors = [] # Training errors
+    genErrors   = [] # Generalisation errors
+
+    for setIndex in range(numBins):
         testInsts  = sets[setIndex]
         trainInsts = flatten(sets[:setIndex] + sets[setIndex + 1:])
 
-        net.trainBackProp(trainInsts, 0.05, 300)
+        preprocTestInsts, preproc = preprocess(trainInsts)
+        preprocTrainInsts = preprocessWith(testInsts, preproc)
 
-        errors = [euclideanDist(net.fwdPass(inst), inst.label)
-                for inst in testInsts]
+        net = trainNet(mean, stdDev, layout, preprocTrainInsts, rate, iters)
 
-        avgErrors.append(sum(errors)/len(errors))
+        trainErrors.append(testNet(net, preprocTrainInsts))
+        genErrors.append(testNet(net, preprocTestInsts))
 
-    return sum(avgErrors)/len(avgErrors)
+    avTrainErr = sum(trainErrors)/len(trainErrors)
+    avGenErr   = sum(genErrors)/len(genErrors)
+
+    return (avTrainErr * preproc.scaleInst.label[0]) + \
+            preproc.meanInst.label[0], \
+            (avGenErr * preproc.scaleInst.label[0]) + preproc.meanInst.label[0]
 
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    dmdInsts, meanInst = demean(insts)
-    scldInsts, scaleInst = scale(dmdInsts)
-
-    net = Network.gaussWtsNet(0, 0.3, 13, [13, 5, 1])
-
-    err = crossVal(10, insts, net)
-
-    print str((err * scaleInst.label[0]) + meanInst.label[0])
+    trainErr, genErr = crossVal(10, 0, 0.3, [13, 13, 1], insts, 0.1, 100)
+    print 'Training error:', trainErr
+    print 'Generalisation error:', genErr

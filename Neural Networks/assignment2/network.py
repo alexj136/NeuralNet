@@ -6,7 +6,7 @@ import math
 class Network:
     def __init__(self, layers):
         '''Build a new Network from a list of Layers'''
-        self.layers        = layers
+        self.layers = layers
 
     def __str__(self):
         '''Get a nice string representation of this Network object'''
