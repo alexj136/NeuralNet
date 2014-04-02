@@ -91,20 +91,10 @@ class Network:
                 for layerNo in range(len(self.layers) - 2, -1, -1):
                     layer = self.layers[layerNo]
 
-                    for nodeNo in range(len(layer.nodes)):
-                        node = layer.nodes[nodeNo]
-
-                        # To calculate the value of the sum in the delta
-                        # equation, iterate over every node in the next layer,
-                        # calculating the product of each node's delta with the
-                        # weighting it gives to this node
-                        sumVal = 0
-                        for toNode in self.layers[layerNo + 1].nodes:
-                            sumVal = sumVal + (
-                                    toNode.delta * toNode.wts[nodeNo + 1])
-                                    # nodeNo + 1 because wts[0] is the bias
-
-                        node.delta = derivSigmoid(node.activn) * sumVal
+                    for nodeNo, node in enumerate(layer.nodes):
+                        node.delta = derivSigmoid(node.activn) * sum([
+                            (toNode.delta * toNode.wts[nodeNo + 1])
+                            for toNode in self.layers[layerNo + 1].nodes])
 
                 # Update the weights for the input layer
                 for node in self.layers[0].nodes:
