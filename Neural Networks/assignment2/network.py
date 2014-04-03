@@ -105,9 +105,7 @@ class Network:
 
                 # Update the weights for the layers after the input layer
                 for layerNo in range(1, len(self.layers)):
-
-                    for nodeNo in range(len(self.layers[layerNo].nodes)):
-                        node = self.layers[layerNo].nodes[nodeNo]
+                    for nodeNo, node in enumerate(self.layers[layerNo].nodes):
 
                         node.wts[0] = node.wts[0] - (rate * node.delta)
                         wtIndex = 1

@@ -69,6 +69,6 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    trainErr, genErr = crossVal(10, 0, 0.3, [13, 5, 5, 1], insts, 0.1, 50)
+    trainErr, genErr = crossVal(10, 0, 0.3, [13, 5, 5, 1], insts, 0.01, 50)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr
