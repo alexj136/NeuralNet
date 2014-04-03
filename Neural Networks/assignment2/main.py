@@ -54,7 +54,7 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
         preprocTestInsts, preproc = preprocess(trainInsts)
         preprocTrainInsts = preprocessWith(testInsts, preproc)
 
-        net = trainNet(mean, stdDev, layout, preprocTrainInsts, rate, iters)
+        net = trainNet(mean, stdDev, layout, trainInsts, rate, iters)
 
         trainErrors.append(testNet(net, preprocTrainInsts))
         genErrors.append(testNet(net, preprocTestInsts))
@@ -69,6 +69,6 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    trainErr, genErr = crossVal(10, 0, 0.3, [13, 5, 5, 1], insts, 0.01, 50)
+    trainErr, genErr = crossVal(5, 0, 0.2, [13, 20, 1], insts, 0.5, 100)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr

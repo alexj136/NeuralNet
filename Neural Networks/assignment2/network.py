@@ -81,13 +81,12 @@ class Network:
                 # for this instance
                 out = self.fwdPass(inst)
 
-                # Update delta values for the output layer
-                for nodeNo in range(len(out)):
-                    node = self.outputLayer.nodes[nodeNo]
+                # Recalculate delta values for the output layer
+                for nodeNo, node in enumerate(self.outputLayer.nodes):
                     node.delta = -1 * derivSigmoid(node.activn) * (
                             inst.label[nodeNo] - out[nodeNo])
 
-                # Update delta values for the hidden layers
+                # Recalculate delta values for the hidden layers
                 for layerNo in range(len(self.layers) - 2, -1, -1):
                     layer = self.layers[layerNo]
 
@@ -201,7 +200,12 @@ def sigmoid(x, k=1):
         sigmoid(x) = 1 / 1 - e^(-1 * k * x)
     where 'x' is a variable and 'k' and is an optionally specified coefficient.
     The function is used when computing the activation of a Node.'''
-    return 1 / (1 + (math.e ** (-1 * k * x)))
+    if x < -45:
+        return 0
+    elif x > 45:
+        return 1
+    else:
+        return 1 / (1 + math.pow(math.e, -1 * k * x))
 
 def derivSigmoid(x, k=1):
     '''Compute the value of the derivative of the sigmoid function at a given x,
