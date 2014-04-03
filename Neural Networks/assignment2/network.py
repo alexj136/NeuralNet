@@ -72,14 +72,17 @@ class Network:
     def trainBackProp(self, insts, rate, iters):
         '''Train the network using the back propagation algorithm, for a given
         set of instances and a given learning rate'''
-
+        print '=== DO TRAIN ==='
         for x in range(iters):
-
+            
+            err = []
             for inst in insts:
                 # Pass the instance through the network so that node activations
                 # correspond to this instance, and to get the network's output
                 # for this instance
                 out = self.fwdPass(inst)
+
+                err.append(0.5 * sum([pow(inst.label[i] - out[i], 2) for i in range(len(out))]))
 
                 # Recalculate delta values for the output layer
                 for nodeNo, node in enumerate(self.outputLayer.nodes):
@@ -112,6 +115,7 @@ class Network:
                             node.wts[wtIndex] = node.wts[wtIndex] - (rate *
                                     node.delta * sigmoid(inputNode.activn))
                             wtIndex = wtIndex + 1
+            print 'ERR:', sum(err)/len(err)
 
 
 class Layer:
@@ -200,12 +204,7 @@ def sigmoid(x, k=1):
         sigmoid(x) = 1 / 1 - e^(-1 * k * x)
     where 'x' is a variable and 'k' and is an optionally specified coefficient.
     The function is used when computing the activation of a Node.'''
-    if x < -45:
-        return 0
-    elif x > 45:
-        return 1
-    else:
-        return 1 / (1 + math.pow(math.e, -1 * k * x))
+    return 1 / (1 + math.pow(math.e, -1 * k * x))
 
 def derivSigmoid(x, k=1):
     '''Compute the value of the derivative of the sigmoid function at a given x,
