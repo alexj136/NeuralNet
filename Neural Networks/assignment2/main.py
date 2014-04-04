@@ -66,9 +66,15 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
             preproc.meanInst.label[0], \
             (avGenErr * preproc.scaleInst.label[0]) + preproc.meanInst.label[0]
 
+xorData = \
+        [ Instance([-1, -1], [-1])
+        , Instance([-1,  1], [ 1])
+        , Instance([ 1, -1], [ 1])
+        , Instance([ 1,  1], [-1])
+        ]
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    trainErr, genErr = crossVal(5, 0, 0.2, [13, 20, 1], insts, 0.5, 100)
+    trainErr, genErr = crossVal(4, 0, 3, [13, 3, 1], insts, 1, 1000)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr

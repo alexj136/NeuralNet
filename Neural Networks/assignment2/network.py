@@ -65,7 +65,10 @@ class Network:
             for node in layer.nodes:
                 node.activn = node.activation(vec)
 
-            vec = [sigmoid(node.activn) for node in layer.nodes]
+            if layer is self.outputLayer:
+                vec = [node.activn for node in layer.nodes]
+            else:
+                vec = [sigmoid(node.activn) for node in layer.nodes]
 
         return vec
 
@@ -204,7 +207,9 @@ def sigmoid(x, k=1):
         sigmoid(x) = 1 / 1 - e^(-1 * k * x)
     where 'x' is a variable and 'k' and is an optionally specified coefficient.
     The function is used when computing the activation of a Node.'''
-    return 1 / (1 + math.pow(math.e, -1 * k * x))
+    if   x < -100: return 0
+    elif x >  100: return 1
+    else         : return 1 / (1 + math.pow(math.e, -1 * k * x))
 
 def derivSigmoid(x, k=1):
     '''Compute the value of the derivative of the sigmoid function at a given x,
