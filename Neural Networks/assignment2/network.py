@@ -1,5 +1,5 @@
 from instances import *
-from random    import gauss as gaussRandom
+from random import gauss as gaussRandom, shuffle
 import numpy as np
 import math
 
@@ -80,12 +80,18 @@ class Network:
             
             err = []
             for inst in insts:
+                
+                # Randomising the order in which the instances are presented reduces
+                # the risk of getting stuck in a local minimum
+                shuffle(insts)
+
                 # Pass the instance through the network so that node activations
                 # correspond to this instance, and to get the network's output
                 # for this instance
                 out = self.fwdPass(inst)
 
-                err.append(0.5 * sum([pow(inst.label[i] - out[i], 2) for i in range(len(out))]))
+                err.append(0.5 * sum([pow(inst.label[i] - out[i], 2)
+                    for i in range(len(out))]))
 
                 # Recalculate delta values for the output layer
                 for nodeNo, node in enumerate(self.outputLayer.nodes):
@@ -118,6 +124,7 @@ class Network:
                             node.wts[wtIndex] = node.wts[wtIndex] - (rate *
                                     node.delta * sigmoid(inputNode.activn))
                             wtIndex = wtIndex + 1
+
             print 'ERR:', sum(err)/len(err)
 
 

@@ -127,9 +127,9 @@ def scale(insts):
     newInsts = deepcopy(insts)
     for inst in newInsts:
         for d in range(len(inst.data)):
-            inst.data[d] = ((inst.data[d] / featScales[d]) +1) /2
+            inst.data[d] = inst.data[d] / featScales[d]
         for l in range(len(inst.label)):
-            inst.label[l] = ((inst.label[l] / labelScales[l]) +1) /2
+            inst.label[l] = inst.label[l] / labelScales[l]
 
     return newInsts, Instance(featScales, labelScales)
 
@@ -139,7 +139,7 @@ def scaleNewInst(inst, scaleFacs):
     but in the scaled domain.'''
     newInst = deepcopy(inst)
     for feat in range(len(newInst.data)):
-        newInst.data[feat] = ((newInst.data[feat] / scaleFacs.data[feat]) +1) /2
+        newInst.data[feat] = newInst.data[feat] / scaleFacs.data[feat]
     for lbl in range(len(newInst.label)):
-        newInst.label[lbl] = ((newInst.label[lbl] / scaleFacs.label[lbl]) +1) /2
+        newInst.label[lbl] = newInst.label[lbl] / scaleFacs.label[lbl]
     return newInst

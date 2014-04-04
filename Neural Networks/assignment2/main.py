@@ -75,6 +75,6 @@ xorData = \
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    trainErr, genErr = crossVal(4, 0, 3, [13, 3, 1], insts, 1, 1000)
+    trainErr, genErr = crossVal(4, 0, 3, [13, 5, 5, 5, 1], insts, 0.5, 1000)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr
