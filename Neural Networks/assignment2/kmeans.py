@@ -26,6 +26,7 @@ def kRandomPrototypes(k, insts):
                             for feat in range(len(insts[0].data))]
                     , None) for x in range(k)]
 
+
 def kMeans(k, insts):
     '''Perform k-means clustering on the given instances. Return the k prototype
     instances (these are not instances from the data set itself).'''
@@ -33,7 +34,7 @@ def kMeans(k, insts):
     protos = kRandomPrototypes(k, insts)
 
     prevClustering = bins(k, insts)
-    converged = false
+    converged = False
 
     while not converged:
 
@@ -51,14 +52,22 @@ def kMeans(k, insts):
                 if curDist < bestDist:
                     bestIdx  = idx
                     bestDist = curDist
-            clusters[bestIdx].append(inst)
+            newClustering[bestIdx].append(inst)
 
         # Recompute the prototypes to be mean values of data in their cluster
-        raise Exception('kMeans: prototype update not yet implemented')
+        protos = [meanInst(cluster) for cluster in newClustering]
 
         # If the current clusters contain the same elements as they did last
         # time, we've converged
-        raise Exception('kMeans: convergence not yet implemented')
+        foundDiff = False
+        prevClusterSets = map(set, prevClustering)
+        for cluster in newClustering:
+            if set(cluster) not in prevClusterSets:
+                foundDiff = True
+                break
+        converged = not foundDiff
+
+        prevClustering = newClustering
 
     return protos
 
