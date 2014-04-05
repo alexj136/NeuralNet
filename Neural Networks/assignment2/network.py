@@ -2,6 +2,7 @@ from instances import *
 from random import gauss as gaussRandom, shuffle
 import numpy as np
 import math
+from misc import euclideanDist
 
 class Network:
     def __init__(self, layers):
@@ -226,7 +227,3 @@ def derivSigmoid(x, k=1):
     where k is the same coefficient used in the sigmoid function.'''
     sigX = sigmoid(x, k)
     return k * sigX * (1 - sigX)
-
-def euclideanDist(x, y):
-    '''Compute the euclidean distance between two vectors (lists) x and y'''
-    return math.sqrt(sum(map(lambda xi, yi: math.pow(xi - yi, 2), x, y)))

@@ -1,27 +1,7 @@
 from instances  import *
 from network    import *
 from preprocess import *
-
-def bins(n, data):
-    '''Break a single list up into a list of n lists, differing in size by no
-    more than 1. Does not modify the original list, but data is not copied.
-    Ordering of elements in output is arbitrary.'''
-    sets = [[] for x in range(n)]
-
-    setIndex = 0
-    elemIndex = 0
-
-    while elemIndex < len(data):
-        sets[setIndex].append(data[elemIndex])
-        elemIndex = elemIndex + 1
-        setIndex = setIndex + 1 if setIndex + 1 < len(sets) else 0
-
-    return sets
-
-def flatten(lists):
-    '''Flatten a list of lists into one list, maintaining ordering. As with
-    bins(), the given list is not modified, but data is not copied.'''
-    return [elem for lst in lists for elem in lst]
+from misc       import *
 
 def trainNet(mean, stdDev, layout, trainInsts, rate, iters):
     '''Train a network with the given training instances, initialised with
@@ -66,12 +46,6 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
             preproc.meanInst.label[0], \
             (avGenErr * preproc.scaleInst.label[0]) + preproc.meanInst.label[0]
 
-xorData = \
-        [ Instance([-1, -1], [-1])
-        , Instance([-1,  1], [ 1])
-        , Instance([ 1, -1], [ 1])
-        , Instance([ 1,  1], [-1])
-        ]
 if __name__ == '__main__':
 
     insts = parseTrainingData()
