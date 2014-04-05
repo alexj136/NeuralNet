@@ -1,5 +1,5 @@
 from instances  import *
-from network    import *
+from mlp        import *
 from preprocess import *
 from misc       import *
 

@@ -81,7 +81,7 @@ def kMeans(k, insts):
 
         prevClustering = newClustering
 
-    return protos
+    return protos, newClustering
 
 if __name__ == '__main__':
     insts = parseTrainingData()

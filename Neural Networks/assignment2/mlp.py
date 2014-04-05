@@ -82,8 +82,8 @@ class Network:
             err = []
             for inst in insts:
                 
-                # Randomising the order in which the instances are presented reduces
-                # the risk of getting stuck in a local minimum
+                # Randomising the order in which the instances are presented 
+                # reduces the risk of getting stuck in a local minimum
                 shuffle(insts)
 
                 # Pass the instance through the network so that node activations
