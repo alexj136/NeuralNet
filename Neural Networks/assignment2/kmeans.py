@@ -38,7 +38,6 @@ def kMeans(k, insts):
 
     while not converged:
 
-
         # Assignment step - put each instance in the cluster corresponding to
         # its closest prototype
         newClustering = [[] for x in range(k)]
@@ -48,14 +47,27 @@ def kMeans(k, insts):
             bestIdx = 0
             bestDist = euclideanDist(inst.data, protos[bestIdx].data)
             for idx in range(len(protos)):
-                curDist = euclideanDist(inst.data, protos[idx].data)
+
+                # None prototypes are produced if clusters are empty, so set
+                # curDist = bestDist + 1 so we don't put the instance in this
+                # cluster
+                if protos[idx] is None:
+                    curDist = bestDist + 1
+                else:
+                    curDist = euclideanDist(inst.data, protos[idx].data)
+
                 if curDist < bestDist:
                     bestIdx  = idx
                     bestDist = curDist
+
             newClustering[bestIdx].append(inst)
 
-        # Recompute the prototypes to be mean values of data in their cluster
-        protos = [meanInst(cluster) for cluster in newClustering]
+        # Recompute the prototypes to be mean values of data in their cluster.
+        # If their cluster is now empty, do not update the prototype.
+        for idx in range(len(newClustering)):
+            meanI = meanInst(newClustering[idx])
+            if meanI is not None:
+                protos[idx] = meanI
 
         # If the current clusters contain the same elements as they did last
         # time, we've converged
