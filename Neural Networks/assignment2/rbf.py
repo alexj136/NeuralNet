@@ -1,7 +1,7 @@
 import math
 from kmeans import kMeans
 from mlp    import Node
-from misc   import euclideanDist
+from misc   import euclideanDist, meanInst
 
 class RBFNetwork:
     def __init__(self, numProtos, numOutputs):
@@ -30,8 +30,19 @@ class RBFNetwork:
                 for x in range(len(self.wtSumNodes))]
 
         protos, clusters = kMeans(len(self.rbfNodes), insts)
-        
-        raise Exception('Beta value calculation not yet implemented')
+
+        # Calculate beta coefficients
+        betas = []
+        for cluster in clusters:
+            clusterMean = meanInst(cluster)
+            meanDists = [euclideanDist(inst, clusterMean) for inst in cluster]
+            sigma = sum(meanDists)/len(cluster)
+            betas.append(1.0 / (2 * math.pow(sigma, 2)))
+
+        # Create the RBF nodes from the prototype & beta coefficient
+        self.rbfNodes = [RBFNode(proto, beta)
+                for proto, beta in zip(protos, betas)]
+
         raise Exception('Weight learning not yet implemented')
 
 class RBFNode:
