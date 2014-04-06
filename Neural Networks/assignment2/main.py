@@ -1,5 +1,6 @@
 from instances  import *
 from mlp        import *
+from rbf        import *
 from preprocess import *
 from misc       import *
 
@@ -49,6 +50,13 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    trainErr, genErr = crossVal(4, 0, 3, [13, 5, 5, 5, 1], insts, 0.5, 1000)
-    print 'Training error:', trainErr
-    print 'Generalisation error:', genErr
+    #trainErr, genErr = crossVal(4, 0, 3, [13, 5, 5, 5, 1], insts, 0.5, 1000)
+    #print 'Training error:', trainErr
+    #print 'Generalisation error:', genErr
+
+    net = RBFNetwork(5, 1)
+    tr = insts[:400]
+    te = insts[400:]
+    net.train(0, 0.3, tr, 0.1, 100)
+    for inst in te:
+        print 'LABEL:', inst.label, 'PRED:', net.fwdPass(inst)
