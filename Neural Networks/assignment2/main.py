@@ -54,9 +54,11 @@ if __name__ == '__main__':
     #print 'Training error:', trainErr
     #print 'Generalisation error:', genErr
 
-    net = RBFNetwork(5, 1)
     tr = insts[:400]
     te = insts[400:]
-    net.train(0, 0.3, tr, 0.1, 100)
-    for inst in te:
+    pptr, pp = preprocess(tr)
+    ppte = preprocessWith(te, pp)
+    net = RBFNetwork()
+    net.train(0, 0.3, pptr, 80, 0.001, 0.001)
+    for inst in ppte:
         print 'LABEL:', inst.label, 'PRED:', net.fwdPass(inst)

@@ -35,9 +35,7 @@ def flatten(lists):
 
 def meanInst(insts):
     '''Create a prototype/mean Instance for the given Instances'''
-    if len(insts) == 0:
-        print 'WARNING: meanInst - empty list given'
-        return None
+    if len(insts) == 0: return None
 
     featMeans = []
 
