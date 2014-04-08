@@ -112,19 +112,19 @@ class Network:
                 for node in self.layers[0].nodes:
                     node.wts[0] = node.wts[0] - (rate * node.delta)
                     for inputVal in range(len(inst.data)):
-                        node.wts[inputVal + 1] = node.wts[inputVal + 1] - (
-                                rate * node.delta * inst.data[inputVal])
+                        node.wts[inputVal + 1] -= rate * node.delta * \
+                                inst.data[inputVal]
 
                 # Update the weights for the layers after the input layer
                 for layerNo in range(1, len(self.layers)):
                     for nodeNo, node in enumerate(self.layers[layerNo].nodes):
 
-                        node.wts[0] = node.wts[0] - (rate * node.delta)
+                        node.wts[0] -= rate * node.delta
                         wtIndex = 1
                         for inputNode in self.layers[layerNo - 1].nodes:
-                            node.wts[wtIndex] = node.wts[wtIndex] - (rate *
-                                    node.delta * sigmoid(inputNode.activn))
-                            wtIndex = wtIndex + 1
+                            node.wts[wtIndex] -= rate * node.delta * \
+                                    sigmoid(inputNode.activn)
+                            wtIndex += 1
 
             print 'ERR:', sum(err)/len(err)
 

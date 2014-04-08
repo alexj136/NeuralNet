@@ -89,8 +89,8 @@ class RBFNetwork:
                 for inst in insts:
                     rbfLayerOut = [1] + self.passRBFLayer(inst) # [1] + for bias
                     for wtIndex in range(len(node.wts)):
-                        node.wts[wtIndex] = node.wts[wtIndex] + (rate *
-                                rbfLayerOut[wtIndex] * inst.label[outputIndex])
+                        node.wts[wtIndex] += rate * rbfLayerOut[wtIndex] * \
+                                inst.label[outputIndex]
 
                 if conv.test(node.wts): break
 
