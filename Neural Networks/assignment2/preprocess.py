@@ -20,11 +20,23 @@ def preprocess(insts):
     scaledInsts, scaleInst = scale(demeanedInsts)
     return scaledInsts, Preprocessor(meanInst, scaleInst)
 
-def preprocessWith(insts, preproc):
+def pprWith(insts, preproc):
     '''Preprocess a list of instances according to the mapping described by the
     given Preprocessor object.'''
     demeanedInsts = [demeanNewInst(inst, preproc.meanInst) for inst in insts]
     return [scaleNewInst(inst, preproc.scaleInst) for inst in demeanedInsts]
+
+def unppr(inst, preproc):
+    '''Re-scale and re-mean an instance, returning an instance in the original
+    domain.'''
+    cpy = deepcopy(inst)
+    for i in range(len(cpy.data)):
+        cpy.data[i] = (cpy.data[i] * preproc.scaleInst.data[i]) + \
+                preproc.meanInst.data[i]
+    for i in range(len(cpy.label)): 
+        cpy.label[i] = cpy.label[i] * preproc.scaleInst.label[i] + \
+                preproc.meanInst.label[i]
+    return cpy
 
 def demean(insts):
     '''Produce a new list of instances from the given ones, that have been

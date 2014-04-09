@@ -4,25 +4,19 @@ from rbf        import *
 from preprocess import *
 from misc       import *
 
-def trainNet(mean, stdDev, layout, trainInsts, rate, iters):
-    '''Train a network with the given training instances, initialised with
-    random weights drawn from a gaussian distribution with the given mean and
-    standard deviation. The Network will have the given layout (see the
-    docstring for Network.gaussWtsNet()), and will be trained with the given
-    learning rate, for the given number of iterations.'''
-
-    net = Network.gaussWtsNet(mean, stdDev, layout)
-    net.trainBackProp(trainInsts, rate, iters)
-
-    return net
-
 def testNet(net, testInsts):
-    '''Test this network with the given test instances. Return the mean
+    '''Test a network with the given test instances. Return the mean
     euclidean distance of the target output from the actual output.'''
     return sum([euclideanDist(net.fwdPass(inst), inst.label)
             for inst in testInsts])/len(testInsts)
 
-def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
+def crossVal(net, numBins, insts, rate, convergenceThreshold, maxIters):
+    '''Perform cross-validation of the given network, with the given number
+    of bins, with the given instances, with the given learning rate, with the
+    given convergence threshold, and the given maximum number of iterations.
+    Works for RBFNetworks and MLPNetworks.'''
+
+    assert numBins > 1 # Can't cross-validate with less than two bins
 
     sets = bins(numBins, insts)
     trainErrors = [] # Training errors
@@ -32,33 +26,35 @@ def crossVal(numBins, mean, stdDev, layout, insts, rate, iters):
         testInsts  = sets[setIndex]
         trainInsts = flatten(sets[:setIndex] + sets[setIndex + 1:])
 
-        preprocTestInsts, preproc = preprocess(trainInsts)
-        preprocTrainInsts = preprocessWith(testInsts, preproc)
+        pprTestInsts, ppr = preprocess(trainInsts)
+        pprTrainInsts = pprWith(testInsts, ppr)
 
-        net = trainNet(mean, stdDev, layout, trainInsts, rate, iters)
+        net.reinitialise()
+        net.train(pprTrainInsts, rate, convergenceThreshold, maxIters)
 
-        trainErrors.append(testNet(net, preprocTrainInsts))
-        genErrors.append(testNet(net, preprocTestInsts))
+        trainErrors.append(testNet(net, pprTrainInsts))
+        genErrors.append(testNet(net, pprTestInsts))
 
-    avTrainErr = sum(trainErrors)/len(trainErrors)
-    avGenErr   = sum(genErrors)/len(genErrors)
+    meanTrainErr = sum(trainErrors)/len(trainErrors)
+    meanGenErr   = sum(genErrors)/len(genErrors)
 
-    return (avTrainErr * preproc.scaleInst.label[0]) + \
-            preproc.meanInst.label[0], \
-            (avGenErr * preproc.scaleInst.label[0]) + preproc.meanInst.label[0]
+    for i, ppi in zip(sets[0], pprTestInsts):
+        print 'LBL:', i.label, 'PRD:', \
+                unppr(Instance([], net.fwdPass(ppi)), ppr).label
+
+    return meanTrainErr * ppr.scaleInst.label[0], \
+            meanGenErr * ppr.scaleInst.label[0]
 
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-    #trainErr, genErr = crossVal(4, 0, 3, [13, 5, 5, 5, 1], insts, 0.5, 1000)
-    #print 'Training error:', trainErr
-    #print 'Generalisation error:', genErr
 
-    tr = insts[:400]
-    te = insts[400:]
-    pptr, pp = preprocess(tr)
-    ppte = preprocessWith(te, pp)
-    net = RBFNetwork()
-    net.train(0, 0.3, pptr, 80, 0.001, 0.001)
-    for inst in ppte:
-        print 'LABEL:', inst.label, 'PRED:', net.fwdPass(inst)
+    rbf = RBFNetwork(0, 0.3, 20, 1)
+    trainErr, genErr = crossVal(rbf, 2, insts, 0.3, 0.001, 100)
+    print 'Training error:', trainErr
+    print 'Generalisation error:', genErr
+
+    mlp = MLPNetwork(0, 0.3, [13, 13, 1])
+    trainErr, genErr = crossVal(mlp, 2, insts, 0.3, None, 100)
+    print 'Training error:', trainErr
+    print 'Generalisation error:', genErr

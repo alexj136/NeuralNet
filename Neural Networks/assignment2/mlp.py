@@ -4,10 +4,21 @@ import numpy as np
 import math
 from misc import euclideanDist
 
-class Network:
-    def __init__(self, layers):
-        '''Build a new Network from a list of Layers'''
-        self.layers = layers
+class MLPNetwork:
+    def __init__(self, mean, stdDev, layout):
+        '''Create a network with specified layout, where every weight (including
+        biases) is initialised with a random number drawn from a normal
+        distribution with the specified mean and standard deviation'''
+        self.mean = mean
+        self.stdDev = stdDev
+        self.layout = layout
+        self.reinitialise()
+
+    def reinitialise(self):
+        '''Reset the parameters - 'un-train' - this network'''
+        self.layers = [Layer.gaussWtsLayer(self.mean, self.stdDev, \
+                self.layout[x-1], self.layout[x]) \
+                for x in range(1, len(self.layout))]
 
     def __str__(self):
         '''Get a nice string representation of this Network object'''
@@ -35,26 +46,6 @@ class Network:
         '''Get the output layer of this Network'''
         return self.layers[len(self.layers) - 1]
 
-    @staticmethod
-    def zeroWtsNet(layout):
-        '''Create a network from the given layout. A layout is a list of
-        integers that specifies the network's configuration, e.g. a layout of
-        [2, 9, 4, 1] will produce a network with an input layer with two nodes
-        (i.e. the input data has two features), two hidden layers, the first
-        with 9 nodes and the second with 4, and an output layer with one node.
-        All weights are initialised to zero.'''
-        return Network([Layer.zeroWtsLayer(layout[x-1], layout[x])
-                for x in range(1, len(layout))])
-
-    @staticmethod
-    def gaussWtsNet(mean, stdDev, layout):
-        '''Like zeroWtsNet, but instead of initialising all weights to zero,
-        every weight (including biases) is initialised with a normally
-        distributed random number drawn from a distribution with the specified
-        mean and standard deviation'''
-        return Network([Layer.gaussWtsLayer(mean, stdDev, layout[x-1],
-                layout[x]) for x in range(1, len(layout))])
-
     def fwdPass(self, inst):
         '''Given an input instance, calculate all node activations to produce an
         output vector - a prediction for the given instance'''
@@ -66,6 +57,7 @@ class Network:
             for node in layer.nodes:
                 node.activn = node.activation(vec)
 
+            # Don't apply the sigmoid function to the output of the last layer.
             if layer is self.outputLayer:
                 vec = [node.activn for node in layer.nodes]
             else:
@@ -73,13 +65,17 @@ class Network:
 
         return vec
 
-    def trainBackProp(self, insts, rate, iters):
+    def train(self, insts, rate, convergenceThreshold, maxIters):
         '''Train the network using the back propagation algorithm, for a given
-        set of instances and a given learning rate'''
-        print '=== DO TRAIN ==='
-        for x in range(iters):
+        set of instances and a given learning rate. Stop when the convergence
+        threshold is reached, or when the maximum allowed number of iterations
+        (epochs) have been reached.'''
+
+        if convergenceThreshold is not None:
+            print 'WARNING: Convergence threshold not implemented for MLP'
+
+        for x in range(maxIters):
             
-            err = []
             for inst in insts:
                 
                 # Randomising the order in which the instances are presented 
@@ -90,9 +86,6 @@ class Network:
                 # correspond to this instance, and to get the network's output
                 # for this instance
                 out = self.fwdPass(inst)
-
-                err.append(0.5 * sum([pow(inst.label[i] - out[i], 2)
-                    for i in range(len(out))]))
 
                 # Recalculate delta values for the output layer
                 for nodeNo, node in enumerate(self.outputLayer.nodes):
@@ -126,9 +119,6 @@ class Network:
                                     sigmoid(inputNode.activn)
                             wtIndex += 1
 
-            print 'ERR:', sum(err)/len(err)
-
-
 class Layer:
     def __init__(self, nodes):
         '''Build a new Layer from a list of nodes'''
@@ -141,13 +131,6 @@ class Layer:
     def node(self, nodeNo):
         '''Get the node of the given number'''
         return self.nodes[nodeNo]
-
-    @staticmethod
-    def zeroWtsLayer(numWtsPerNode, numNodes):
-        '''Create a single network layer for data of the specified
-        dimensionality, with a number of nodes given by numNodes, and all nodes
-        initialised with zero weights.'''
-        return Layer([Node.zeroWtsNode(numWtsPerNode) for x in range(numNodes)])
 
     @staticmethod
     def gaussWtsLayer(mean, stdDev, numWtsPerNode, numNodes):
@@ -186,19 +169,13 @@ class Node:
         self.wts[wtNo] = val
 
     @staticmethod
-    def zeroWtsNode(numInputs):
-        '''Create a single network node with a specified number of inputs. The
-        Node will have one more weight than numInputs - the extra weight is the
-        bias for this Node. Weights are initialised to 0.'''
-        return Node([0 for x in range(numInputs + 1)]) # +1 for a bias weight
-
-    @staticmethod
     def gaussWtsNode(mean, stdDev, numInputs):
         '''Create a single network node with a specified number of inputs. The
         Node will have one more weight than numInputs - the extra weight is the
         bias for this Node. Weights are initialised with normally distributed
         random values, drawn from a distribution of given mean and standard
         deviation'''
+        # + 1 for bias weight
         return Node([gaussRandom(mean, stdDev) for x in range(numInputs + 1)])
 
     def activation(self, vec):

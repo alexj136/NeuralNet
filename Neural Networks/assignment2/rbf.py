@@ -2,13 +2,22 @@ import math
 from copy   import deepcopy
 from kmeans import kMeans
 from mlp    import Node
-from misc   import euclideanDist, meanInst
+from misc   import euclideanDist, meanInst, flatten
 
 class RBFNetwork:
-    def __init__(self):
+    def __init__(self, mean, stdDev, numProtos, numOutputs):
         '''Create a new RBFNetwork'''
+        self.mean = mean
+        self.stdDev = stdDev
+        self.numProtos = numProtos
+        self.numOutputs = numOutputs
+        self.reinitialise()
+
+    def reinitialise(self):
+        '''Reset the parameters - 'un-train' - this network'''
         self.rbfNodes = None
-        self.wtSumNodes = None
+        self.wtSumNodes = [Node.gaussWtsNode(self.mean, self.stdDev, \
+                self.numProtos) for x in range(self.numOutputs)]
 
     @property
     def isTrained(self):
@@ -26,15 +35,14 @@ class RBFNetwork:
         rbfNodeOutputs = self.passRBFLayer(inst)
         return [node.activation(rbfNodeOutputs) for node in self.wtSumNodes]
 
-    def train(self, wtMean, wtStdDev, insts, numProtos, rate, \
-            convergenceThreshold, maxIters=1000):
+    def train(self, insts, rate, convergenceThreshold, maxIters):
         '''Train this RBFNN - calculate beta values for each RBF node, and
         perform gradient descent to learn weights for the weighted sum nodes.
         The wtMean and wtStdDev parameters are the mean and standard deviation
         of the gaussian distribution from which initial weights for the weighted
         sum nodes will be randomly drawn.'''
 
-        protos, clusters = kMeans(numProtos, insts)
+        protos, clusters = kMeans(self.numProtos, insts)
 
         print map(len, clusters), 'NON-EMPTY:', \
                 sum([1 if len(c) != 0 else 0 for c in clusters])
@@ -49,10 +57,6 @@ class RBFNetwork:
                 newClusters.append(clusters[idx])
         protos = newProtos
         clusters = newClusters
-
-        # Create weighted sum nodes
-        self.wtSumNodes = [Node.gaussWtsNode(wtMean, wtStdDev,
-                len(protos)) for x in range(len(insts[0].label))]
 
         # Calculate beta coefficients
         betas = []
@@ -77,22 +81,23 @@ class RBFNetwork:
         self.rbfNodes = [RBFNode(proto, beta)
                 for proto, beta in zip(protos, betas)]
 
-        # Perform gradient descent to learn weights for the output nodes. The
-        # algorithm is run independently for each dimension of the network
-        # output.
-        for outputIndex, node in enumerate(self.wtSumNodes):
 
-            # Set up the ConvergenceTester for this run of gradient descent
-            conv = ConvergenceTester(convergenceThreshold)
+        # Perform gradient descent to learn weights for the output nodes.
+        conv = ConvergenceTester(convergenceThreshold)
+        for x in range(maxIters):
 
-            for x in range(maxIters):
-                for inst in insts:
-                    rbfLayerOut = [1] + self.passRBFLayer(inst) # [1] + for bias
-                    for wtIndex in range(len(node.wts)):
-                        node.wts[wtIndex] += rate * rbfLayerOut[wtIndex] * \
-                                inst.label[outputIndex]
+            rbfOutputs = [[1] + self.passRBFLayer(inst) for inst in insts]
+            predictions = [self.fwdPass(inst) for inst in insts]
 
-                if conv.test(node.wts): break
+            for outputIndex, node in enumerate(self.wtSumNodes):
+
+                for wtIdx in range(len(node.wts)):
+                    node.wts[wtIdx] -= (rate * (sum([( \
+                            predictions[i][outputIndex] - \
+                            inst.label[outputIndex]) * rbfOutputs[i][wtIdx] \
+                            for i, inst in enumerate(insts)])/len(insts)))
+
+            if conv.test(flatten([node.wts for node in self.wtSumNodes])): break
 
 class RBFNode:
     def __init__(self, proto, beta):

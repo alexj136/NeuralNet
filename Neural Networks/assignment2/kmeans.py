@@ -1,6 +1,7 @@
-from random import uniform
+from random    import uniform, randint
+from copy      import deepcopy
 from instances import *
-from misc import *
+from misc      import *
 
 def minmax(insts):
     '''Return an instance with feature values that are the minimum of all
@@ -18,14 +19,11 @@ def minmax(insts):
     return Instance(minFeats, None), Instance(maxFeats, None)
 
 def kRandomPrototypes(k, insts):
-    '''Generate k random prototypes for the given data. Prototypes do not have
-    labels.'''
-    minInst, maxInst = minmax(insts)
-    return [Instance(
-                    [uniform(minInst.data[feat], maxInst.data[feat])
-                            for feat in range(len(insts[0].data))]
-                    , None) for x in range(k)]
-
+    '''Choose k instances from the given list at random to be prototypes.
+    The returned Instances are deep copies of the chosen Instances. They do not
+    have label values.'''
+    return [Instance(deepcopy(insts[i].data), None) for i in \
+            [randint(0, len(insts) - 1) for x in range(k)]]
 
 def kMeans(k, insts):
     '''Perform k-means clustering on the given instances. Return the k prototype
