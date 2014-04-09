@@ -44,9 +44,6 @@ class RBFNetwork:
 
         protos, clusters = kMeans(self.numProtos, insts)
 
-        print map(len, clusters), 'NON-EMPTY:', \
-                sum([1 if len(c) != 0 else 0 for c in clusters])
-
         # Filter empty clusters
         newProtos = []
         newClusters = []
