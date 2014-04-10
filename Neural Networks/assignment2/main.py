@@ -73,36 +73,48 @@ def crossVal(net, numBins, insts, rate, convergenceThreshold, maxIters,
 
 if __name__ == '__main__':
 
+    # Perform tests of this implementation  - various MLP layouts & RBF
+    # configurations. Should run in about 2 hours.
+
     insts = parseTrainingData()
     predInsts = parsePredictionData()
 
-    '''
+    # Test of chosen model on prediction data
 
-    for protos , withPCA in [(1, True), (5, True), (10, True), (20, True), \
+    mlp = MLPNetwork(0, 0.3, [13, 13, 4, 1])
+    pcaTrainInsts, ppr = pcaPreprocess(insts)
+    pcaTestInsts = pcaPprWith(predInsts, ppr)
+    mlp.train(pcaTrainInsts, 0.3, None, 1000)
+    for inst, pcaInst in zip(predInsts, pcaTestInsts):
+        print 'INST:', inst.data
+        print 'PRED:', (mlp.fwdPass(pcaInst)[0] * \
+                ppr.preproc.scaleInst.label[0]) + ppr.preproc.meanInst.label[0]
+
+    # Cross-validation tests of various configurations
+
+    for protos, withPCA in [(1, True), (5, True), (10, True), (20, True), \
             (1, False), (5, False), (10, False), (20, False)]:
 
         rbf = RBFNetwork(0, 0.3, protos, 1)
         eucTrainErr, eucGenErr, msqTrainErr, msqGenErr = \
-                crossVal(rbf, 2, insts, 0.3, 0.001, 100, usePCA=withPCA)
+                crossVal(rbf, 10, insts, 0.3, 0.001, 100, usePCA=withPCA)
         print 'RBF: PROTOS:', str(protos), 'PCA:', str(withPCA)
         print 'Euclidean Training error:', eucTrainErr
         print 'Euclidean Generalisation error:', eucGenErr
         print 'Mean Squared Training error:', msqTrainErr
         print 'Mean Squared Generalisation error:', msqGenErr
 
-    '''
-
-    for lyt, withPCA in [([13, 1], True), ([13, 4, 1], True), \
-            ([13, 13, 1], True), ([13, 13, 4, 1], True), \
-            ([13, 13, 13, 1], True), ([13, 1], False), ([13, 4, 1], False), \
-            ([13, 13, 1], False), ([13, 13, 4, 1], False), \
-            ([13, 13, 13, 1], False)]:
+    for lyt, withPCA in [([13,         1], True ), ([13, 4,      1], True ), \
+                         ([13, 13,     1], True ), ([13, 13, 4,  1], True ), \
+                         ([13, 13, 13, 1], True ), ([13,         1], False), \
+                         ([13, 4,      1], False), ([13, 13,     1], False), \
+                         ([13, 13, 4,  1], False), ([13, 13, 13, 1], False)]:
 
         mlp = MLPNetwork(0, 0.3, lyt)
         eucTrainErr, eucGenErr, msqTrainErr, msqGenErr = \
-                crossVal(mlp, 2, insts, 0.3, None, 1000, usePCA=withPCA)
+                crossVal(mlp, 10, insts, 0.3, None, 1000, usePCA=withPCA)
+        print 'MLP: LAYOUT:', str(lyt), 'PCA:', str(withPCA)
         print 'Euclidean Training error:', eucTrainErr
         print 'Euclidean Generalisation error:', eucGenErr
         print 'Mean Squared Training error:', msqTrainErr
         print 'Mean Squared Generalisation error:', msqGenErr
-

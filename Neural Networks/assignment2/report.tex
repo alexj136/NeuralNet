@@ -30,25 +30,28 @@
 \noindent The MLP structure with the best generalisation was found to have an input layer of size 13 (as this is the dimensionality of the feature data), two hidden layers, the first with 13 neurons, the second with 4 neurons, and an output layer with a single neuron (as the target value is 1-dimensional). More complicated structures tended to have lower training error, but a higher generalisation error - they begin to over-fit the training data and thus generalise poorly. Conversely, simpler structures tended to have higher training \emph{and} generalisation error - they lack the expressive power to capture all nuances and trends in the data that are required for accurate prediction.
 \subsection*{Results}
 \noindent The table below summarises the results for various network configurations and free parameter choices:
-
-\begin{tabular}{c | c | c | c | c | c}
-    MLP Results & & & & & \\
-    \hline
-    Network Layout & PCA & Mean Euclidean Dist. & & Mean Sq. Error & \\
-    \hline
-    & & Training & Generalisation & Training & Gen. \\
-    \hline
-    13, 1         & Yes & 7.55 & 7.00 & 221.1 & 124.5 \\
-    13, 4, 1      & Yes & 1.94 & 2.68 & 6.23 & 15.4 \\
-    13, 13, 1     & Yes & 1.44 & 2.78 & 3.45 & 16.8 \\
-    13, 13, 4, 1  & Yes &  &  &  &  \\
-    13, 13, 13, 1 & Yes &  &  &  &  \\
-    13, 1         & No  &  &  &  &  \\
-    13, 4, 1      & No  &  &  &  &  \\
-    13, 13, 1     & No  &  &  &  &  \\
-    13, 13, 4, 1  & No  &  &  &  &  \\
-    13, 13, 13, 1 & No  &  &  &  &  \\
-\end{tabular}
+\vspace{4mm} \\
+\clearpage
+\centerline{
+    \begin{tabular}{ p{2cm} | p{1cm} | p{2cm} | p{2cm} | p{2cm} | p{2cm} }
+        MLP Results & & & & & \\
+        \hline
+        & & Mean Euclidean Distance & & Mean Squared Error & \\
+        \hline
+        Network Layout & PCA & Training & Generalisation & Training & Generalisation \\
+        \hline
+        13, 1         & Yes & 7.55 & 7.00 & 221 & 125 \\
+        13, 4, 1      & Yes & 1.94 & 2.68 & 6.23 & 15.4 \\
+        13, 13, 1     & Yes & 1.44 & 2.78 & 3.45 & 16.8 \\
+        13, 13, 4, 1  & Yes & 1.26 & 2.28 & 2.81 & 12.8 \\
+        13, 13, 13, 1 & Yes & 1.26 & 2.41 & 2.73 & 15.6 \\
+        13, 1         & No  & 3.31 & 3.45 & 22.9 & 25.0 \\
+        13, 4, 1      & No  & 2.10 & 2.53 & 8.46 & 14.7 \\
+        13, 13, 1     & No  & 1.88 & 2.51 & 6.54 & 13.6 \\
+        13, 13, 4, 1  & No  & 1.90 & 2.86 & 6.35 & 15.5 \\
+        13, 13, 13, 1 & No  & 1.90 & 3.12 & 6.23 & 19.7 \\
+    \end{tabular}
+}
 
 \section*{Radial Basis Function Network}
 \subsection*{Training Procedure}
@@ -60,27 +63,50 @@
 \subsection*{Performance}
 The number of prototypes selected was typically the only significant factor that determined performance. I found that 20 gave the lowest generalisation error. Using less than 20 typically gave greater training and generalisation error, as the learned model does not capture all the trends and nuances in the data. Using more than 20 prototypes greatly reduces training error, and by using every instance as a prototype, a training error of essentially zero can be achieved. However as more prototypes are used, the model begins to learn the noise in the data and generalisation error increases.
 \subsection*{Results}
-\noindent The table below summarises the results for various RBFN configurations and free parameter choices:
-
-\begin{tabular}{c | c | c | c | c | c}
-    RBF Results & & & & & \\
-    \hline
-    Prototypes & PCA & Mean Euclidean Dist. & & Mean Sq. Error & \\
-    \hline
-    & & Training & Generalisation & Training & Gen. \\
-    \hline
-    1 & Yes & 6.67 & 6.67 & 84.4 & 84.5 \\
-    5 & Yes & 5.61 & 5.63 & 63.6 & 64.1 \\
-    10 & Yes & 4.79 & 4.88 & 48.9 & 50.3 \\
-    20 & Yes & 4.65 & 4.80 & 44.4 & 48.0 \\
-    1 & No & 6.65 & 6.68 & 83.6 & 84.0 \\
-    10 & No & 5.68 & 5.74 & 62.9 & 64.3 \\
-    5 & No & 5.26 & 5.25 & 55.5 & 57.2 \\
-    20 & No & 4.67 & 4.88 & 46.4 & 48.4 \\
-\end{tabular}
+\noindent The table below summarises the results for various RBFN configurations and free parameter choices: \\
+\vspace{4mm} \\
+\centerline{
+    \begin{tabular}{ c | c | c | c | c | c }
+        RBF Results & & & & & \\
+        \hline
+        Prototypes & PCA & Mean Euclidean Distance & & Mean Squared Error & \\
+        \hline
+        & & Training & Generalisation & Training & Generalisation \\
+        \hline
+        1  & Yes & 6.67 & 6.67 & 84.4 & 84.5 \\
+        5  & Yes & 5.61 & 5.63 & 63.6 & 64.1 \\
+        10 & Yes & 4.79 & 4.88 & 48.9 & 50.3 \\
+        20 & Yes & 4.65 & 4.80 & 44.4 & 48.0 \\
+        1  & No  & 6.65 & 6.68 & 83.6 & 84.0 \\
+        5  & No  & 5.68 & 5.74 & 62.9 & 64.3 \\
+        10 & No  & 5.26 & 5.25 & 55.5 & 57.2 \\
+        20 & No  & 4.67 & 4.88 & 46.4 & 48.4 \\
+    \end{tabular}
+}
+\vspace{4mm} \\
+\noindent Interestingly, these show that performing PCA has little to no effect on the ability of RBF to learn the underlying function. The results are little or no better with PCA than without.
 
 \section*{Final Model}
-The final model chosen is an MLP with thirteen inputs, one hidden layer with four neurons, and an output layer with one neuron, using PCA, because this has the lowest generalisation error of all the configurations discussed. This has a mean squared generalisation error of 15.4, which corresponds to an average deviation between the  prediction value and target value of \$2680.
+The final model chosen is an MLP with thirteen inputs, two hidden layers, the first with thirteen and the second with four neurons, and an output layer with one neuron, using PCA, because this has the lowest generalisation error of all the configurations discussed. This has a mean squared generalisation error of 12.8, with an average deviation between the prediction value and target value of \$2280.
+
+\section*{Predictions}
+Below are the predictions of the final model for the prediction data in the file prediction\_data.htm: \\
+\vspace{4mm} \\
+\centerline{
+    \begin{tabular}{ c | c | c | c | c | c | c | c | c | c | c | c | c | c }
+        CRIM & ZN & INDUS & CHAS & NOX & RM & AGE & DIS & RAD & TAX & PTRATIO & B & LSTAT & MEDV (Predicted)\\
+        \hline
+        0.03601 &0.0&5.066 &0.0& 0.4629&6.5558& 45.0 & 6.0278& 1.0 & 291.0 & 17.5 & 389.27 & 7.37 & 25.4 \\
+        12.07703&0.0&18.1  &0.0& 0.6724&6.0222& 89.8 & 2.0613& 24.0& 666.0 & 20.2 & 288.08 & 18.6 & 14.0 \\
+        0.09743 &0.0&4.418 &0.0& 0.4524&6.473 & 49.3 & 5.1465& 3.0 & 246.0 & 18.1 & 392.41 & 9.07 & 25.5 \\
+        0.39397 &0.0&10.746&0.0& 0.5043&6.1331& 60.8 & 4.433 & 4.0 & 335.0 & 19.1 & 382.72 & 12.19& 21.4 \\
+        0.15014 &0.0&8.198 &0.0& 0.5148&6.1047& 60.1 & 4.0249& 6.0 & 372.0 & 17.8 & 387.36 & 12.3 & 21.6 \\
+        0.15042 &0.0&5.034 &0.0& 0.441 &6.6478& 40.1 & 6.4959& 7.0 & 304.0 & 18.4 & 388.43 & 7.98 & 25.9 \\
+        0.37141 &0.0&5.932 &0.0& 0.4925&6.9508& 67.3 & 4.4106& 8.0 & 301.0 & 17.9 & 385.27 & 7.96 & 30.0 \\
+        0.68786 &0.0&9.759 &0.0& 0.5709&6.3932& 69.2 & 3.6973& 5.0 & 331.0 & 16.5 & 369.19 & 10.65& 23.2 \\
+    \end{tabular}
+}
+
 
 \section*{Appendix}
 \subsection*{File: main.py}
