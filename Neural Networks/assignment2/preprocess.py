@@ -142,25 +142,29 @@ def pcaPreprocess(insts):
     transformed data and an object that can be used to perform the same
     transformation on other unseen instances.'''
 
+    # Normalise the instances
+    normInsts, preproc = preprocess(insts)
+
     # Perform PCA on the feature information of the given instances
-    pcaObj = PCA(np.array(deepcopy([inst.data for inst in insts])))
+    pcaObj = PCA(np.array(deepcopy([inst.data for inst in normInsts])))
 
     # Replace the old feature data with the PCA'd feature data
     pcaInsts = deepcopy([Instance(pcaData, inst.label)
-            for pcaData, inst in zip(pcaObj.Y.tolist(), insts)])
+            for pcaData, inst in zip(pcaObj.Y.tolist(), normInsts)])
 
-    # Normalise the labels of the instances (No need to do PCA on these)
-    normPCAInsts, preproc = preprocess(pcaInsts)
-
-    return normPCAInsts, PCAPreprocessor(pcaObj, preproc)
+    return pcaInsts, PCAPreprocessor(pcaObj, preproc)
 
 def pcaPprWith(insts, pcaPreproc):
+
+    # Normalise
+    normInsts = pprWith(insts, pcaPreproc.preproc)
+
     # Project the new feature data into the PCA axis
-    pcaData = map(pcaPreproc.pcaObj.project, [i.data for i in insts])
+    pcaData = map(pcaPreproc.pcaObj.project, [i.data for i in normInsts])
 
     # Replace the old feature data with the PCA'd feature data
     pcaInsts = deepcopy([Instance(pcaD, inst.label)
-            for pcaD, inst in zip(pcaData, insts)])
+            for pcaD, inst in zip(pcaData, normInsts)])
 
     # Return normalised PCA'd data
-    return pprWith(pcaInsts, pcaPreproc.preproc)
+    return pcaInsts

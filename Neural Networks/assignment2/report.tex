@@ -31,6 +31,25 @@
 \subsection*{Results}
 \noindent The table below summarises the results for various network configurations and free parameter choices:
 
+\begin{tabular}{c | c | c | c | c | c}
+    MLP Results & & & & & \\
+    \hline
+    Network Layout & PCA & Mean Euclidean Dist. & & Mean Sq. Error & \\
+    \hline
+    & & Training & Generalisation & Training & Gen. \\
+    \hline
+    13, 1         & Yes & 7.55 & 7.00 & 221.1 & 124.5 \\
+    13, 4, 1      & Yes & 1.94 & 2.68 & 6.23 & 15.4 \\
+    13, 13, 1     & Yes & 1.44 & 2.78 & 3.45 & 16.8 \\
+    13, 13, 4, 1  & Yes &  &  &  &  \\
+    13, 13, 13, 1 & Yes &  &  &  &  \\
+    13, 1         & No  &  &  &  &  \\
+    13, 4, 1      & No  &  &  &  &  \\
+    13, 13, 1     & No  &  &  &  &  \\
+    13, 13, 4, 1  & No  &  &  &  &  \\
+    13, 13, 13, 1 & No  &  &  &  &  \\
+\end{tabular}
+
 \section*{Radial Basis Function Network}
 \subsection*{Training Procedure}
 \noindent A gaussian kernel RBFN was used, with the euclidean measure of distance. With more time I would like to have tried using mahalonobis distance. \\
@@ -41,11 +60,27 @@
 \subsection*{Performance}
 The number of prototypes selected was typically the only significant factor that determined performance. I found that 20 gave the lowest generalisation error. Using less than 20 typically gave greater training and generalisation error, as the learned model does not capture all the trends and nuances in the data. Using more than 20 prototypes greatly reduces training error, and by using every instance as a prototype, a training error of essentially zero can be achieved. However as more prototypes are used, the model begins to learn the noise in the data and generalisation error increases.
 \subsection*{Results}
-\noindent The table below summarises the results for various network configurations and free parameter choices:
+\noindent The table below summarises the results for various RBFN configurations and free parameter choices:
+
+\begin{tabular}{c | c | c | c | c | c}
+    RBF Results & & & & & \\
+    \hline
+    Prototypes & PCA & Mean Euclidean Dist. & & Mean Sq. Error & \\
+    \hline
+    & & Training & Generalisation & Training & Gen. \\
+    \hline
+    1 & Yes & 6.67 & 6.67 & 84.4 & 84.5 \\
+    5 & Yes & 5.61 & 5.63 & 63.6 & 64.1 \\
+    10 & Yes & 4.79 & 4.88 & 48.9 & 50.3 \\
+    20 & Yes & 4.65 & 4.80 & 44.4 & 48.0 \\
+    1 & No & 6.65 & 6.68 & 83.6 & 84.0 \\
+    10 & No & 5.68 & 5.74 & 62.9 & 64.3 \\
+    5 & No & 5.26 & 5.25 & 55.5 & 57.2 \\
+    20 & No & 4.67 & 4.88 & 46.4 & 48.4 \\
+\end{tabular}
 
 \section*{Final Model}
-\subsection*{Justification}
-\subsection*{Performance}
+The final model chosen is an MLP with thirteen inputs, one hidden layer with four neurons, and an output layer with one neuron, using PCA, because this has the lowest generalisation error of all the configurations discussed. This has a mean squared generalisation error of 15.4, which corresponds to an average deviation between the  prediction value and target value of \$2680.
 
 \section*{Appendix}
 \subsection*{File: main.py}

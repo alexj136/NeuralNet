@@ -4,10 +4,23 @@ from rbf        import *
 from preprocess import *
 from misc       import *
 
-def testNet(net, testInsts):
+def testNetEuclidean(net, testInsts):
     '''Test a network with the given test instances. Return the mean
     euclidean distance of the target output from the actual output.'''
     return sum([euclideanDist(net.fwdPass(inst), inst.label)
+            for inst in testInsts])/len(testInsts)
+
+def testNetMeanSquared(net, testInsts, ppr):
+    '''Test a network with the given test instances. Return the mean
+    squared error. Requires a Preprocessor object to rescale values.'''
+
+    if isinstance(ppr, Preprocessor):
+        factor = ppr.scaleInst.label[0]
+    else:
+        factor = ppr.preproc.scaleInst.label[0]
+
+    return sum([sum([math.pow((t * factor) - (l * factor), 2)
+            for t, l in zip(net.fwdPass(inst), inst.label)])
             for inst in testInsts])/len(testInsts)
 
 def crossVal(net, numBins, insts, rate, convergenceThreshold, maxIters,
@@ -20,8 +33,10 @@ def crossVal(net, numBins, insts, rate, convergenceThreshold, maxIters,
     assert numBins > 1 # Can't cross-validate with less than two bins
 
     sets = bins(numBins, insts)
-    trainErrors = [] # Training errors
-    genErrors   = [] # Generalisation errors
+    eucTrainErrors = [] # Euclidean distance training errors
+    eucGenErrors   = [] # Euclidean distance generalisation errors
+    msqTrainErrors = [] # Mean squared training errors
+    msqGenErrors   = [] # Mean squared generalisation errors
 
     for setIndex in range(numBins):
         testInsts  = sets[setIndex]
@@ -37,41 +52,57 @@ def crossVal(net, numBins, insts, rate, convergenceThreshold, maxIters,
         net.reinitialise()
         net.train(pprTrainInsts, rate, convergenceThreshold, maxIters)
 
-        trainErrors.append(testNet(net, pprTrainInsts))
-        genErrors.append(testNet(net, pprTestInsts))
+        eucTrainErrors.append(testNetEuclidean(net, pprTrainInsts))
+        eucGenErrors.append(testNetEuclidean(net, pprTestInsts))
+        msqTrainErrors.append(testNetMeanSquared(net, pprTrainInsts, ppr))
+        msqGenErrors.append(testNetMeanSquared(net, pprTestInsts, ppr))
 
-    meanTrainErr = sum(trainErrors)/len(trainErrors)
-    meanGenErr   = sum(genErrors)/len(genErrors)
+    eucTrainErr = sum(eucTrainErrors)/len(eucTrainErrors)
+    eucGenErr   = sum(eucGenErrors)/len(eucGenErrors)
+    msqTrainErr = sum(msqTrainErrors)/len(msqTrainErrors)
+    msqGenErr   = sum(msqGenErrors)/len(msqGenErrors)
 
     if usePCA:
-        for i, ppi in zip(sets[0], pprTestInsts):
-            print 'LBL:', i.label, 'PRD:', \
-                    unppr(Instance([], net.fwdPass(ppi)), ppr.preproc).label
-        return meanTrainErr * ppr.preproc.scaleInst.label[0], \
-                meanGenErr * ppr.preproc.scaleInst.label[0]
+        return eucTrainErr * ppr.preproc.scaleInst.label[0], \
+                eucGenErr * ppr.preproc.scaleInst.label[0], \
+                msqTrainErr, msqGenErr
     else:
-        for i, ppi in zip(sets[0], pprTestInsts):
-            print 'LBL:', i.label, 'PRD:', \
-                    unppr(Instance([], net.fwdPass(ppi)), ppr).label
-
-        return meanTrainErr * ppr.scaleInst.label[0], \
-                meanGenErr * ppr.scaleInst.label[0]
+        return eucTrainErr * ppr.scaleInst.label[0], \
+                eucGenErr * ppr.scaleInst.label[0], \
+                msqTrainErr, msqGenErr
 
 if __name__ == '__main__':
 
     insts = parseTrainingData()
-
-    rbf = RBFNetwork(0, 0.3, 20, 1)
-    trainErr, genErr = crossVal(rbf, 10, insts, 0.3, 0.001, 100, usePCA=True)
-    #trainErr, genErr = crossVal(rbf, 2, insts, 0.3, 0.001, 100, usePCA=False)
-    print 'Training error:', trainErr
-    print 'Generalisation error:', genErr
+    predInsts = parsePredictionData()
 
     '''
 
-    mlp = MLPNetwork(0, 0.3, [13, 13, 4, 1])
-    trainErr, genErr = crossVal(mlp, 2, insts, 0.3, None, 1000, usePCA=True)
-    print 'Training error:', trainErr
-    print 'Generalisation error:', genErr
+    for protos , withPCA in [(1, True), (5, True), (10, True), (20, True), \
+            (1, False), (5, False), (10, False), (20, False)]:
+
+        rbf = RBFNetwork(0, 0.3, protos, 1)
+        eucTrainErr, eucGenErr, msqTrainErr, msqGenErr = \
+                crossVal(rbf, 2, insts, 0.3, 0.001, 100, usePCA=withPCA)
+        print 'RBF: PROTOS:', str(protos), 'PCA:', str(withPCA)
+        print 'Euclidean Training error:', eucTrainErr
+        print 'Euclidean Generalisation error:', eucGenErr
+        print 'Mean Squared Training error:', msqTrainErr
+        print 'Mean Squared Generalisation error:', msqGenErr
 
     '''
+
+    for lyt, withPCA in [([13, 1], True), ([13, 4, 1], True), \
+            ([13, 13, 1], True), ([13, 13, 4, 1], True), \
+            ([13, 13, 13, 1], True), ([13, 1], False), ([13, 4, 1], False), \
+            ([13, 13, 1], False), ([13, 13, 4, 1], False), \
+            ([13, 13, 13, 1], False)]:
+
+        mlp = MLPNetwork(0, 0.3, lyt)
+        eucTrainErr, eucGenErr, msqTrainErr, msqGenErr = \
+                crossVal(mlp, 2, insts, 0.3, None, 1000, usePCA=withPCA)
+        print 'Euclidean Training error:', eucTrainErr
+        print 'Euclidean Generalisation error:', eucGenErr
+        print 'Mean Squared Training error:', msqTrainErr
+        print 'Mean Squared Generalisation error:', msqGenErr
+

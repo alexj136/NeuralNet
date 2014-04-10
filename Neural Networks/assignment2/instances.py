@@ -36,6 +36,26 @@ def parseTrainingData():
     # Convert the data matrix into a list of instances and return it
     return map(Instance, featureMatrix, targetValMatrix)
 
+def parsePredictionData():
+    '''Parse the file training_instances.txt into a list of Instance objects'''
+    # Get the file as a string
+    with open('prediction_data.txt', 'r') as f: text = f.read()
+
+    # Split the string into a list of lines
+    lines = text.split('\n')
+
+    # Split each line into a list of strings, removing any empty lines
+    splitLines = filter(lambda ln: ln != [], map(lambda s: s.split(), lines))
+
+    # Parse a float from each string
+    floatMatrix = map(lambda ln: map(float, ln), splitLines)
+
+    # Ensure that all the instances have the same dimensionality
+    ensureSameDimensionality(floatMatrix)
+
+    # Convert the data matrix into a list of instances and return it
+    return [Instance(d, []) for d in floatMatrix]
+
 def ensureSameDimensionality(valueMatrix):
     '''Guarantee that, for a list of lists, all lists have the same length'''
     dimensionality = len(valueMatrix[0])
