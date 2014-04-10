@@ -61,18 +61,17 @@ if __name__ == '__main__':
 
     insts = parseTrainingData()
 
-    '''
     rbf = RBFNetwork(0, 0.3, 20, 1)
-    trainErr, genErr = crossVal(rbf, 2, insts, 0.3, 0.001, 100, usePCA=True)
+    trainErr, genErr = crossVal(rbf, 10, insts, 0.3, 0.001, 100, usePCA=True)
     #trainErr, genErr = crossVal(rbf, 2, insts, 0.3, 0.001, 100, usePCA=False)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr
 
     '''
 
-    mlp = MLPNetwork(0, 0.3, [13, 13, 1])
-    #trainErr, genErr = crossVal(mlp, 2, insts, 0.3, None, 100, usePCA=True)
-    trainErr, genErr = crossVal(mlp, 2, insts, 0.3, None, 100, usePCA=False)
+    mlp = MLPNetwork(0, 0.3, [13, 13, 4, 1])
+    trainErr, genErr = crossVal(mlp, 2, insts, 0.3, None, 1000, usePCA=True)
     print 'Training error:', trainErr
     print 'Generalisation error:', genErr
 
+    '''

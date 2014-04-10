@@ -9,9 +9,88 @@
 \begin{centering}
 \subsubsection*{Abstract}
 \end{centering}
-\noindent This report will detail the implementation of a multi-layer perceptron and a radial basis function network, in order to predict house prices in the Boston area, a benchmark problem in the field. \\
-\indent The implementation is written in Python. No Neural Network libraries or toolkits were used to implement MLP or RBFN, however the Matplotlib.mlab library was used to perform principal component analysis. Matplotlib and Numpy were used to produce graphs.
+\noindent This report will detail the implementation of a Multi-Layer Perceptron (MLP) and a Radial Basis Function Network (RBFN), in order to predict house prices in the Boston area, a benchmark problem in the field. \\
+\indent The implementation is written in Python. No Neural Network libraries or toolkits were used to implement MLP or RBFN, however the Matplotlib.mlab library was used to perform principal component analysis (PCA). Matplotlib and Numpy were used to produce graphs. \\
+\indent All error values (unless otherwise stated) are given as mean-squared distance, with unit of thousands of dollars squared. They were produced using 10-fold cross-validation.
+\vspace{4mm}
+
+\section*{Pre-Processing}
+\noindent Preprocessing was performed with both MLP and RBFN. Experiments were performed using only normalisation, and normalisation with PCA.
+\subsection*{Normalisation}
+\noindent Normalisation was achieved by first demeaning the data, and then scaling it, such that all values exist between -1 and 1. This allows the network to be trained in far fewer iterations, since very large and very small weight values are not required, which take many iterations to learn. It also increases the performance of the learned function, by preventing features with relatively large values taking precedence over ones with relatively small values, e.g. tax rate (typically around 300) vs number of rooms (typically around 5).
+\subsection*{Principal Component Analysis}
+\noindent Matplotlib provides an implementation of PCA which was used in this implementation. Where PCA is applied, normalisation has been performed first.
 
 \section*{Multi-Layer Perceptron}
+\subsection*{Training Procedure}
+\noindent The MLP is trained using the backpropagation algorithm, as described on page 29 of the lecture slides for MLP. A learning rate of 0.3 was found to be ideal. It is not so large as to prevent the network from converging to an accurate solution (or not converging at all), but is large enough to avoid getting stuck in local minima. \\
+\indent Weights were initialised with random values, drawn from a gaussian distribution with $\mu$ = 0 and $\sigma$ = 0.3. \\
+\indent Convergence is typically indicated when the weights change by only a (given) very small amount between each epoch. However, with MLP, since there are many weights, and since, the weight values must be checked at each epoch, this is computationally expensive and slows the process down significantly. As a result, I found it more practical not to check the weights for convergence at all, and simply halt iteration after a predetermined number of epochs. This worked fine. I observed that there is a law of diminishing returns here - the effect on error of each additional epoch became negligible after approximately 1000 epochs with the chosen learning rate, and thus I chose to halt iteration after 1000 epochs in my experimentation.
+\subsection*{Performance}
+\noindent The MLP structure with the best generalisation was found to have an input layer of size 13 (as this is the dimensionality of the feature data), two hidden layers, the first with 13 neurons, the second with 4 neurons, and an output layer with a single neuron (as the target value is 1-dimensional). More complicated structures tended to have lower training error, but a higher generalisation error - they begin to over-fit the training data and thus generalise poorly. Conversely, simpler structures tended to have higher training \emph{and} generalisation error - they lack the expressive power to capture all nuances and trends in the data that are required for accurate prediction.
+\subsection*{Results}
+\noindent The table below summarises the results for various network configurations and free parameter choices:
+
 \section*{Radial Basis Function Network}
+\subsection*{Training Procedure}
+\noindent A gaussian kernel RBFN was used, with the euclidean measure of distance. With more time I would like to have tried using mahalonobis distance. \\
+\indent The RBFN was trained by first selecting prototype instances, using the k-means algorithm, choosing instances randomly from the data set as initial prototypes, and halting when the generated clusters contain the same instances for two successive iterations. The generated prototypes were not actual instances from the data set, with the exception of prototypes with only a single instance in their cluster. \\
+\indent The weights for the output layer were learned via gradient descent. Here, the learning rate is a much less significant factor than with MLP, since the error function is a second order polynomial there are thus no local minima. A learning rate between 1 and 0.1 was sufficient to learn the weights without an unnecessary number of epochs. I used 0.3 in my experiments. \\
+\indent Unlike with MLP, it is not too computationally expensive to determine when the weights converge, and thus when the weights did not deviate by more than 0.001 in each case between successive epochs, the algorithm halted, typically with between 10 and 100 epochs, depending on the chosen prototypes and initial weights. \\
+\indent As with MLP, weights were initialised with random values, drawn from a gaussian distribution with $\mu$ = 0 and $\sigma$ = 0.3. \\
+\subsection*{Performance}
+The number of prototypes selected was typically the only significant factor that determined performance. I found that 20 gave the lowest generalisation error. Using less than 20 typically gave greater training and generalisation error, as the learned model does not capture all the trends and nuances in the data. Using more than 20 prototypes greatly reduces training error, and by using every instance as a prototype, a training error of essentially zero can be achieved. However as more prototypes are used, the model begins to learn the noise in the data and generalisation error increases.
+\subsection*{Results}
+\noindent The table below summarises the results for various network configurations and free parameter choices:
+
+\section*{Final Model}
+\subsection*{Justification}
+\subsection*{Performance}
+
+\section*{Appendix}
+\subsection*{File: main.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: rbf.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: mlp.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: kmeans.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: preprocess.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: instances.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: misc.py}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: training\_data.txt}
+\begin{verbatim}
+a
+\end{verbatim}
+
+\subsection*{File: prediction\_data.txt}
+\begin{verbatim}
+a
+\end{verbatim}
+
 \end{document}
