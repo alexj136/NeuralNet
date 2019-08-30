@@ -1,0 +1,125 @@
+\documentclass{article}
+
+\title{Neural Networks: Assignment 2}
+\author{Candidate Number: 18512}
+
+\begin{document}
+\maketitle
+
+\begin{centering}
+\subsubsection*{Abstract}
+\end{centering}
+\noindent This report will detail the implementation of a Multi-Layer Perceptron (MLP) and a Radial Basis Function Network (RBFN), in order to predict house prices in the Boston area, a benchmark problem in the field. \\
+\indent The implementation is written in Python. No Neural Network libraries or toolkits were used to implement MLP or RBFN, however the Matplotlib library was used to perform principal component analysis (PCA). \\
+\indent All error values (unless otherwise stated) are given as mean-squared distance, with unit of thousands of dollars squared. They were produced using 10-fold cross-validation.
+\vspace{4mm}
+
+\section*{Pre-Processing}
+\noindent Preprocessing was performed with both MLP and RBFN. Experiments were performed using only normalisation, and normalisation with PCA.
+\subsection*{Normalisation}
+\noindent Normalisation was achieved by first demeaning the data, and then scaling it, such that all values exist between -1 and 1. This allows the network to be trained in far fewer iterations, since very large and very small weight values are not required, which take many iterations to learn. It also increases the performance of the learned function, by preventing features with relatively large values taking precedence over ones with relatively small values, e.g. tax rate (typically around 300) vs number of rooms (typically around 5).
+\subsection*{Principal Component Analysis}
+\noindent Matplotlib provides an implementation of PCA which was used in this implementation. Where PCA is applied, normalisation has been performed first.
+
+\section*{Multi-Layer Perceptron}
+\subsection*{Training Procedure}
+\noindent The MLP is trained using sequential backpropagation, as described on page 29 of the lecture slides for MLP. A learning rate of 0.3 was found to be ideal. It is not so large as to prevent the network from converging to an accurate solution (or not converging at all), but is large enough to avoid getting stuck in local minima. \\
+\indent Weights were initialised with random values, drawn from a gaussian distribution with $\mu$ = 0 and $\sigma$ = 0.3. \\
+\indent A sigmoidal activation function was used because it is differentiable, and gives universal approximation when used with two or more hidden layers. \\
+\indent Convergence is typically indicated when the weights change by only a (given) very small amount between each epoch. However, with MLP, since there are many weights, and since the weight values must be checked at each epoch, this is computationally expensive and slows the process down significantly. As a result, I found it more practical not to check the weights for convergence at all, and simply halt iteration after a predetermined number of epochs. This worked fine. I observed that there is a law of diminishing returns here - the effect on error of each additional epoch became negligible after approximately 1000 epochs with the chosen learning rate, and thus I chose to halt iteration after 1000 epochs in my experimentation. \\
+\indent To avoid getting stuck in local minima, the order in which the instances were presented for backpropagation was shuffled with each epoch. \\
+\subsection*{Performance}
+\noindent The MLP structure with the best generalisation was found to have an input layer of size 13 (as this is the dimensionality of the feature data), two hidden layers, the first with 13 neurons, the second with 4 neurons, and an output layer with a single neuron (as the target value is 1-dimensional). More complicated structures tended to have lower training error, but a higher generalisation error - they begin to over-fit the training data and thus generalise poorly. Conversely, simpler structures tended to have higher training \emph{and} generalisation error - they lack the expressive power to capture all nuances and trends in the data that are required for accurate prediction.
+\subsection*{Results}
+\noindent The table below summarises the results for various network configurations and free parameter choices:
+\vspace{4mm} \\
+\clearpage
+\centerline{
+    \begin{tabular}{ | c | c | c | c | c | c | }
+        \hline
+        MLP Results & & & & & \\
+        \hline
+        & & Mean Euclidean Distance & & Mean Squared Error & \\
+        \hline
+        Network Layout & PCA & Training & Generalisation & Training & Generalisation \\
+        \hline
+        \{13, 1\}         & Yes & 7.55 & 7.00 & 221 & 125 \\
+        \{13, 4, 1\}      & Yes & 1.94 & 2.68 & 6.23 & 15.4 \\
+        \{13, 13, 1\}     & Yes & 1.44 & 2.78 & 3.45 & 16.8 \\
+        \{13, 13, 4, 1\}  & Yes & 1.26 & 2.28 & 2.81 & 12.8 \\
+        \{13, 13, 13, 1\} & Yes & 1.26 & 2.41 & 2.73 & 15.6 \\
+        \{13, 1\}         & No  & 3.31 & 3.45 & 22.9 & 25.0 \\
+        \{13, 4, 1\}      & No  & 2.10 & 2.53 & 8.46 & 14.7 \\
+        \{13, 13, 1\}     & No  & 1.88 & 2.51 & 6.54 & 13.6 \\
+        \{13, 13, 4, 1\}  & No  & 1.90 & 2.86 & 6.35 & 15.5 \\
+        \{13, 13, 13, 1\} & No  & 1.90 & 3.12 & 6.23 & 19.7 \\
+        \hline
+    \end{tabular}
+}
+\vspace{4mm}
+\noindent The data shows that the best generalisation is given by the network configuration: \{13, 13, 4, 1\}. While it does not have the lowest training error (2.81 vs 2.73 for \{13, 13, 13, 1\} with PCA, 6.35 vs 6.32 without PCA), it does have the lowest generalisation error when used with PCA (12.8). Without PCA, the configuration \{13, 13, 1\} performs has the lowest generalisation error (13.6).
+
+\section*{Radial Basis Function Network}
+\subsection*{Training Procedure}
+\noindent A gaussian kernel RBFN was used, with the euclidean measure of distance. With more time I would like to have tried using mahalonobis distance. \\
+\indent The RBFN was trained by first selecting prototype instances, using the k-means algorithm, choosing instances randomly from the data set as initial prototypes, and halting when the generated clusters contain the same instances for two successive iterations. The generated prototypes were not actual instances from the data set, with the exception of prototypes with only a single instance in their cluster. After the k-means stage, any empty clusters were removed, since they have no effect on the behaviour of the model, but do increase training time as node weights still have to be updated. \\
+\indent The weights for the output layer were learned via gradient descent. Here, the learning rate is a much less significant factor than with MLP, since the error function is a second order polynomial there are thus no local minima. A learning rate between 1 and 0.1 was sufficient to learn the weights without an inordinate number of epochs. I used 0.3 in my experiments. \\
+\indent Unlike with MLP, it is not too computationally expensive to determine when the weights converge, and thus when the weights did not deviate by more than 0.001 in each case between successive epochs, the algorithm halted, typically with between 10 and 100 epochs, depending on the chosen prototypes and initial weights. \\
+\indent As with MLP, weights were initialised with random values, drawn from a gaussian distribution with $\mu$ = 0 and $\sigma$ = 0.3. \\
+\subsection*{Performance}
+The number of prototypes selected was typically the only significant factor that determined performance. I found that 20 gave the lowest generalisation error. Using less than 20 typically gave greater training and generalisation error, as the learned model does not capture all the trends and nuances in the data. Using more than 20 prototypes greatly reduces training error, and by using every instance as a prototype, a training error of essentially zero can be achieved. However as more prototypes are used, the model begins to learn the noise in the data and generalisation error increases.
+\subsection*{Results}
+\noindent The table below summarises the results for various RBFN configurations and free parameter choices: \\
+\vspace{4mm} \\
+\centerline{
+    \begin{tabular}{ | c | c | c | c | c | c | }
+        \hline
+        RBF Results & & & & & \\
+        \hline
+        Prototypes & PCA & Mean Euclidean Distance & & Mean Squared Error & \\
+        \hline
+        & & Training & Generalisation & Training & Generalisation \\
+        \hline
+        1  & Yes & 6.67 & 6.67 & 84.4 & 84.5 \\
+        5  & Yes & 5.61 & 5.63 & 63.6 & 64.1 \\
+        10 & Yes & 4.79 & 4.88 & 48.9 & 50.3 \\
+        20 & Yes & 4.65 & 4.80 & 44.4 & 48.0 \\
+        1  & No  & 6.65 & 6.68 & 83.6 & 84.0 \\
+        5  & No  & 5.68 & 5.74 & 62.9 & 64.3 \\
+        10 & No  & 5.26 & 5.25 & 55.5 & 57.2 \\
+        20 & No  & 4.67 & 4.88 & 46.4 & 48.4 \\
+        \hline
+    \end{tabular}
+}
+\vspace{4mm} \\
+\noindent It can be seen that increasing the number of prototypes reduces both generalisation and training error. Although no data is presented here, using more than 20 prototypes begins to increase generalisation error, while it continues to decrease training error. This is because the model is over-fitting. Interestingly, these show that performing PCA has little to no effect on the ability of RBF to learn the underlying function. The results are little or no better with PCA than without.
+
+\section*{Final Model}
+The final model chosen is an MLP with thirteen inputs, two hidden layers, the first with thirteen and the second with four neurons, and an output layer with one neuron, using PCA, because this has the lowest generalisation error of all the configurations discussed. This has a mean squared generalisation error of 12.8, with an average deviation between the prediction value and target value of \$2280.
+
+\section*{Predictions}
+Below are the predictions of the final model for the prediction data in the file prediction\_data.htm: \\
+\vspace{4mm} \\
+\centerline{
+    \begin{tabular}{ | c | c | c | c | c | c | c | c | c | c | }
+        \hline
+        Instance Number  & 1       & 2        & 3       & 4       & 5       & 6       & 7       & 8       \\
+        \hline
+        CRIM             & 0.03601 & 12.07703 & 0.09743 & 0.39397 & 0.15014 & 0.15042 & 0.37141 & 0.68786 \\
+        ZN               & 0.0     & 0.0      & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     \\
+        INDUS            & 5.066   & 18.1     & 4.418   & 10.746  & 8.198   & 5.034   & 5.932   & 9.759   \\
+        CHAS             & 0.0     & 0.0      & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     \\
+        NOX              & 0.4629  & 0.6724   & 0.4524  & 0.5043  & 0.5148  & 0.441   & 0.4925  & 0.5709  \\
+        RM               & 6.5558  & 6.0222   & 6.473   & 6.1331  & 6.1047  & 6.6478  & 6.9508  & 6.3932  \\
+        AGE              & 45.0    & 89.8     & 49.3    & 60.8    & 60.1    & 40.1    & 67.3    & 69.2    \\
+        DIS              & 6.0278  & 2.0613   & 5.1465  & 4.433   & 4.0249  & 6.4959  & 4.4106  & 3.6973  \\
+        RAD              & 1.0     & 24.0     & 3.0     & 4.0     & 6.0     & 7.0     & 8.0     & 5.0     \\
+        TAX              & 291.0   & 666.0    & 246.0   & 335.0   & 372.0   & 304.0   & 301.0   & 331.0   \\
+        PTRATIO          & 17.5    & 20.2     & 18.1    & 19.1    & 17.8    & 18.4    & 17.9    & 16.5    \\
+        B                & 389.27  & 288.08   & 392.41  & 382.72  & 387.36  & 388.43  & 385.27  & 369.19  \\
+        LSTAT            & 7.37    & 18.6     & 9.07    & 12.19   & 12.3    & 7.98    & 7.96    & 10.65   \\
+        \hline
+        MEDV (predicted) & 25.4    & 14.0     & 25.5    & 21.4    & 21.6    & 25.9    & 30.0    & 23.2    \\
+        \hline
+    \end{tabular}
+}
